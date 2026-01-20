@@ -13,6 +13,7 @@ import (
 
 	"github.com/mike/claude-pad/internal/action"
 	"github.com/mike/claude-pad/internal/config"
+	"github.com/mike/claude-pad/internal/configpush"
 	"github.com/mike/claude-pad/internal/display"
 	"github.com/mike/claude-pad/internal/gesture"
 	"github.com/mike/claude-pad/internal/hid"
@@ -28,6 +29,9 @@ func main() {
 		switch os.Args[1] {
 		case "set-device", "select-device":
 			runSetDevice(os.Args[2:])
+			return
+		case "config-push":
+			runConfigPush(os.Args[2:])
 			return
 		case "help", "-h", "--help":
 			printUsage()
@@ -174,6 +178,44 @@ func runSetDevice(args []string) {
 		}
 		ui.PrintDeviceCreated(*configPath, vendorID, productID)
 	}
+}
+
+// runConfigPush handles the config-push subcommand
+func runConfigPush(args []string) {
+	fs := flag.NewFlagSet("config-push", flag.ExitOnError)
+	configPath := fs.String("config", "config.yaml", "path to configuration file")
+	fs.Usage = func() {
+		ui.PrintConfigPushUsage()
+	}
+
+	if err := fs.Parse(args); err != nil {
+		os.Exit(1)
+	}
+
+	ui.PrintConfigPushProgress(fmt.Sprintf("Reading config from %s...", *configPath))
+
+	cfg, err := config.Load(*configPath)
+	if err != nil {
+		ui.PrintFatalError("Failed to load config", err.Error())
+		os.Exit(1)
+	}
+
+	ui.PrintConfigPushProgress(fmt.Sprintf("Converting %d button mapping(s)...", len(cfg.Buttons)))
+
+	mountPoint, err := configpush.FindCIRCUITPY()
+	if err != nil {
+		ui.PrintFatalError("Failed to find device", err.Error())
+		os.Exit(1)
+	}
+
+	ui.PrintConfigPushProgress(fmt.Sprintf("Found CIRCUITPY at %s", mountPoint))
+
+	if err := configpush.Push(cfg); err != nil {
+		ui.PrintFatalError("Failed to push config", err.Error())
+		os.Exit(1)
+	}
+
+	ui.PrintConfigPushSuccess(mountPoint, len(cfg.Buttons))
 }
 
 // parseID parses a vendor or product ID from string (supports hex with 0x prefix or decimal)

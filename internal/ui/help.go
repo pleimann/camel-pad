@@ -27,6 +27,7 @@ func PrintUsage(version string) {
 	printSection("Usage", []string{
 		"claude-pad [flags]              Run the middleware",
 		"claude-pad set-device [args]    Configure the HID device",
+		"claude-pad config-push          Push config to CircuitPython device",
 		"claude-pad help                 Show this help message",
 	})
 
@@ -63,6 +64,11 @@ func printCommandSection() {
 	fmt.Printf("  %s\n", cmdStyle.Render("set-device"))
 	fmt.Printf("      Set the HID device in the config file\n")
 	fmt.Printf("      Run %s for more information\n", Code("claude-pad set-device --help"))
+	fmt.Println()
+
+	fmt.Printf("  %s\n", cmdStyle.Render("config-push"))
+	fmt.Printf("      Push button configuration to the CircuitPython device\n")
+	fmt.Printf("      Run %s for more information\n", Code("claude-pad config-push --help"))
 	fmt.Println()
 }
 
@@ -168,4 +174,59 @@ func PrintFatalError(context, message string) {
 	fmt.Println(Error(context))
 	fmt.Printf("  %s\n", Muted(message))
 	fmt.Println()
+}
+
+// PrintConfigPushUsage displays the styled help text for config-push subcommand
+func PrintConfigPushUsage() {
+	fmt.Println(Bold("Usage:"), "claude-pad config-push [options]")
+	fmt.Println()
+	fmt.Println("Push button configuration to the CircuitPython device.")
+	fmt.Println()
+	fmt.Println(Muted("Converts button mappings from config.yaml to Python format"))
+	fmt.Println(Muted("and writes config.py to the CIRCUITPY drive."))
+	fmt.Println()
+
+	fmt.Println(Bold("Options"))
+	fmt.Printf("  %s    Path to configuration file (default \"config.yaml\")\n", SubtitleStyle.Render("-config string"))
+	fmt.Println()
+
+	fmt.Println(Bold("Examples"))
+	examples := []struct {
+		cmd  string
+		desc string
+	}{
+		{"claude-pad config-push", "Push using default config.yaml"},
+		{"claude-pad config-push -config my.yaml", "Push using custom config"},
+	}
+
+	cmdStyle := lipgloss.NewStyle().
+		Foreground(ColorSecondary)
+
+	maxLen := 0
+	for _, ex := range examples {
+		if len(ex.cmd) > maxLen {
+			maxLen = len(ex.cmd)
+		}
+	}
+
+	for _, ex := range examples {
+		padding := strings.Repeat(" ", maxLen-len(ex.cmd)+2)
+		fmt.Printf("  %s%s%s\n", cmdStyle.Render(ex.cmd), padding, Muted(ex.desc))
+	}
+	fmt.Println()
+}
+
+// PrintConfigPushProgress prints progress during config push
+func PrintConfigPushProgress(message string) {
+	fmt.Printf("  %s %s\n", Muted("→"), message)
+}
+
+// PrintConfigPushSuccess prints the success message after config push
+func PrintConfigPushSuccess(mountPoint string, buttonCount int) {
+	fmt.Println()
+	fmt.Println(Success("Configuration pushed successfully"))
+	fmt.Printf("  %s %s\n", Muted("Location:"), mountPoint+"/config.py")
+	fmt.Printf("  %s %d button(s) configured\n", Muted("Buttons:"), buttonCount)
+	fmt.Println()
+	fmt.Println(Muted("Restart your device to apply changes."))
 }
