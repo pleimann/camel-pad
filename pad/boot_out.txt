@@ -1,0 +1,4 @@
+Adafruit CircuitPython 10.0.3 on 2025-10-17; Adafruit Feather ESP32-S3 TFT with ESP32S3
+Board ID:adafruit_feather_esp32s3_tft
+UID:4F21AF951A4E
+MAC:F4:12:FA:59:A1:E4

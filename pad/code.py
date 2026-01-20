@@ -9,6 +9,7 @@ from adafruit_hid.keycode import Keycode
 # Try to import config, use defaults if not present
 try:
     from config import TIMING, BUTTONS
+    
 except ImportError:
     # Default config if config.py doesn't exist yet
     TIMING = {

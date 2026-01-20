@@ -27,9 +27,9 @@ buttons:
   - index: 0
     name: btn_a
     press:
-      keys: ["ctrl+c"]
+      keys: ["ctrl+`"]
     double_press:
-      keys: ["ctrl+z"]
+      keys: ["cmd+z"]
     long_press:
       keys: ["q", "enter"]  # Sequence of keys
 
