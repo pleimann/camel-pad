@@ -31,8 +31,22 @@ controller = PadController(BUTTON_PINS, BUTTONS, TIMING)
 
 print("Camel Pad ready!")
 print(f"Buttons: {controller.button_count}, Configured: {controller.configured_buttons}")
+print(f"Custom HID: {controller.has_custom_hid}, Max keys: {controller.max_simultaneous_keys}")
 
 # Main loop
 while True:
     controller.update()
+
+    # Check for host messages (if using custom HID)
+    msg = controller.get_host_message()
+    if msg:
+        # Process host message - strip null padding and decode if text
+        msg_stripped = msg.rstrip(b'\x00')
+        if msg_stripped:
+            try:
+                text = msg_stripped.decode('utf-8')
+                print(f"Host message: {text}")
+            except UnicodeDecodeError:
+                print(f"Host data: {msg_stripped.hex()}")
+
     time.sleep(0.01)  # 10ms loop delay
