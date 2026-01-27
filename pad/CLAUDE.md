@@ -12,9 +12,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a CircuitPython client application for the camel-pad hardware controller, running on an Adafruit Feather ESP32-S3 TFT.
 
 ```
+boot.py              # USB HID device configuration (runs before code.py)
 code.py              # Main entry point and event loop
 config.py            # Button mappings, pin config, and timing settings
 controller.py        # PadController class - keypad and detector management
+custom_hid.py        # Custom HID device classes (extended keyboard, host messages)
 gesture.py           # ButtonGestureDetector class - gesture state machine
 settings.toml        # WiFi credentials and web API configuration
 lib/                 # Pre-compiled Adafruit libraries (.mpy)
@@ -28,8 +30,33 @@ lib/                 # Pre-compiled Adafruit libraries (.mpy)
 - Detects three gesture types: `press`, `double_press`, `long_press`
 - Configurable timing: `double_press_window_ms` (300ms default), `long_press_threshold_ms` (500ms default)
 - Multi-button support via configurable `BUTTON_PINS` list
-- USB HID keyboard output via `adafruit_hid.keyboard`
+- USB HID keyboard output via `adafruit_hid.keyboard` or custom HID
 - 10ms polling loop for responsive input detection
+
+## Custom HID Support
+
+The pad supports an extended HID protocol configured in `boot.py`:
+
+- **Extended Keyboard (Report ID 1)**: Supports up to 10 simultaneous keycodes (vs standard 6)
+- **Feature Report (Report ID 2)**: Receives messages up to 1024 bytes from host
+- **OUT Report (Report ID 3)**: Receives streaming data in 64-byte packets
+
+The `CamelPadKeyboard` class in `custom_hid.py` provides the same interface as the standard keyboard:
+
+```python
+from custom_hid import CamelPadKeyboard
+keyboard = CamelPadKeyboard(usb_hid.devices)
+keyboard.send(Keycode.A, Keycode.B, Keycode.C)  # Up to 10 keys
+```
+
+Host messages can be received via `CamelPadHostReceiver`:
+
+```python
+from custom_hid import CamelPadHostReceiver
+receiver = CamelPadHostReceiver(usb_hid.devices)
+data = receiver.get_feature_report()  # Up to 1024 bytes
+data = receiver.get_out_report()      # 64 bytes
+```
 
 ## Configuration
 
