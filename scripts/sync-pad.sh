@@ -2,4 +2,4 @@
 
 set -e
 
-rsync --relative --recursive pad/ /Volumes/CIRCUITPY/
+rsync --relative --recursive pad/ /Volumes/CIRCUITPY

@@ -4,8 +4,8 @@
 device:
   # USB HID device identifiers
   # Use `camel-pad --list-devices` to find your device
-  vendor_id: 0x1532
-  product_id: 0x026B
+  vendor_id: 0x239A
+  product_id: 0x811E
   poll_interval_ms: 10
 
 timing:
