@@ -1,0 +1,24 @@
+{
+  "name": "camel-pad",
+  "version": "0.1.0",
+  "description": "Bridge for macropad notifications with Claude Code",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target node"
+  },
+  "keywords": ["macropad", "hid", "notifications"],
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "node-hid": "^3.1.0",
+    "ws": "^8.16.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/ws": "^8.5.10"
+  }
+}
