@@ -1,0 +1,125 @@
+esphome:
+  name: camelpad
+  friendly_name: CamelPad
+  platformio_options:
+    build_flags: "-DBOARD_HAS_PSRAM"
+    board_build.arduino.memory_type: qio_opi
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "1gb4VzHsNBFaXJLb7lD1TsEfCEtWUo1vl8zzWdeY8Mw="
+
+ota:
+  - platform: esphome
+    password: "ab56a8a7376813c21d6419b1f0be06dc"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "CamelPad Hotspot"
+    password: "waqLrbNJO154"
+
+captive_portal:
+
+esp32:
+  variant: esp32s3
+  flash_size: 16MB
+  cpu_frequency: 240MHz
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      #The following LVGL configuration option is for improving the frame rate (LVGL v8.3):
+      CONFIG_LV_MEM_CUSTOM: y
+      CONFIG_LV_MEMCPY_MEMSET_STD: y
+      CONFIG_LV_ATTRIBUTE_FAST_MEM: y
+    advanced:
+      enable_idf_experimental_features: true
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+### Comms Interfaces
+
+spi:
+  clk_pin: GPIO2 #SCK
+  mosi_pin: GPIO1 #SDO
+
+i2c:
+  sda: GPIO15
+  scl: GPIO7
+  scan: True
+
+i2c_device:
+  id: seesaw
+  address: 0x49
+
+tinyusb:
+  usb_vendor_id: 0x303A
+  usb_product_id: 0x4002
+  usb_manufacturer_str: "CamelPad"
+  usb_product_str: "CamelPad ESP32-S3"
+
+usb_cdc_acm:
+  rx_buffer_size: 1024
+
+### Display Configuration
+
+display:
+  - platform: mipi_rgb
+    model: WAVESHARE-3.16-320X820
+    id: pad_disp
+    rotation: 90°
+
+lvgl:
+  id: lvgl_comp
+  displays:
+    - pad_disp
+  pages:
+    - id: canvas_1
+      bg_color: 0x111827
+      pad_all: 5
+      widgets:
+        - label:
+            id: lv_status
+            x: 5
+            y: 5
+            width: 805
+            height: 20
+            text: "STATUS"
+            text_color: 0x00AA00
+            text_align: CENTER
+            long_mode: SCROLL_CIRCULAR
+            text_font: montserrat_16
+
+        - textarea:
+            id: lv_textarea
+            x: 5
+            y: 30
+            width: 805
+            height: 200
+
+        - buttonmatrix:
+            id: lv_buttonmatrix
+            x: 5
+            y: 235
+            width: 810
+            height: 75
+            rows:
+              - buttons:
+                  - id: btn_1
+                    text: "1"
+                  - id: btn_2
+                    text: "2"
+                  - id: btn_3
+                    text: "3"
+                  - id: btn_4
+                    text: "4"
