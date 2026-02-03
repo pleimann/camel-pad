@@ -43,7 +43,7 @@ src/
 ```
 ┌─────────────────┐     HID      ┌─────────────────┐    WebSocket    ┌─────────────────┐
 │   Macropad      │◄────────────►│  camel-pad      │◄───────────────►│  Claude Code    │
-│  (CircuitPython)│              │  (TypeScript)   │                 │  Plugin         │
+│    (ESPHome)    │              │  (TypeScript)   │                 │  Plugin         │
 └─────────────────┘              └─────────────────┘                 └─────────────────┘
      Buttons                          Bridge                          Notifications
      Display                       Gesture detection
@@ -51,10 +51,13 @@ src/
                                    Config (hot-reload)
 ```
 
-## HID Protocol
+## Communication Protocol
 
-- Send text: `[0x01, ...text bytes]` (64-byte report)
+The ESPHome firmware uses USB CDC ACM (serial) via TinyUSB. Message format:
+- Send text: `[0x01, ...text bytes]` (64-byte packets)
 - Receive button: `[0x02, button_id, pressed (0/1)]`
+
+Note: The bridge code still uses node-hid which expects HID device class. Integration with the ESPHome CDC ACM interface may require updating the bridge to use serial communication.
 
 ## WebSocket Protocol
 
@@ -64,7 +67,11 @@ src/
 
 ## Client Application
 
-The corresponding client application running on the camel pad is in the ./pad directory. It is written in CircuitPython.
+The pad firmware is in the ./pad directory, written in ESPHome (ESP-IDF framework). Key configuration:
+- **Device**: ESP32-S3 with PSRAM, 16MB flash
+- **Display**: Waveshare 3.16" 320x820 MIPI RGB with LVGL
+- **Communication**: USB CDC ACM via TinyUSB
+- **Build/Flash**: `esphome run pad/esphome.yaml`
 
 ## Claude Code Plugin
 
