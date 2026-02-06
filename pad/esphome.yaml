@@ -84,7 +84,11 @@ binary_sensor:
   - platform: seesaw
     seesaw_id: seesaw_hub
     pin: 11
-    name: "Button"
+    name: "Button1"
+  - platform: seesaw
+    seesaw_id: seesaw_hub
+    pin: 12
+    name: "Button2"
 
 light:
   - platform: seesaw_neopixel
