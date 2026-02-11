@@ -220,7 +220,7 @@ public:
             cfg.vsync_pulse_width = LCD_VSYNC_PULSE_WIDTH;
             cfg.vsync_back_porch  = LCD_VSYNC_BACK_PORCH;
             cfg.pclk_idle_high    = 0;
-            cfg.de_idle_high      = 1;
+            cfg.de_idle_high      = 0;
 
             _bus_instance.config(cfg);
         }
@@ -240,7 +240,7 @@ public:
 
         {
             auto cfg = _panel_instance.config_detail();
-            cfg.use_psram = 1;
+            cfg.use_psram = 2;  // PSRAM only (0=SRAM, 1=mixed/unimplemented, 2=PSRAM)
             _panel_instance.config_detail(cfg);
         }
 

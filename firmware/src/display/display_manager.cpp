@@ -1,13 +1,27 @@
 #include "display_manager.h"
 #include <cstring>
+#include <esp_heap_caps.h>
 
 bool DisplayManager::begin() {
+    // Check PSRAM availability before display init
+    size_t psram_size = heap_caps_get_total_size(MALLOC_CAP_SPIRAM);
+    size_t psram_free = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    Serial.printf("[display] PSRAM total: %u bytes, free: %u bytes\n", psram_size, psram_free);
+    if (psram_size == 0) {
+        Serial.println("[display] WARNING: No PSRAM detected! Display will not work.");
+    }
+
     st7701::init();
     return beginAfterST7701();
 }
 
 bool DisplayManager::beginAfterST7701() {
     _display.init();
+
+    // Check frame buffer was allocated in PSRAM
+    size_t psram_free_after = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    Serial.printf("[display] PSRAM free after init: %u bytes\n", psram_free_after);
+
     _display.setRotation(1);  // 90-degree rotation: 820x320 landscape
     _display.setBrightness(200);
 
