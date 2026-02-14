@@ -43,7 +43,7 @@ src/
 ```
 ┌─────────────────┐     HID      ┌─────────────────┐    WebSocket    ┌─────────────────┐
 │   Macropad      │◄────────────►│  camel-pad      │◄───────────────►│  Claude Code    │
-│  (CircuitPython)│              │  (TypeScript)   │                 │  Plugin         │
+│    (Arduino)    │              │  (TypeScript)   │                 │  Plugin         │
 └─────────────────┘              └─────────────────┘                 └─────────────────┘
      Buttons                          Bridge                          Notifications
      Display                       Gesture detection
@@ -51,10 +51,24 @@ src/
                                    Config (hot-reload)
 ```
 
-## HID Protocol
+## Communication Protocol
 
-- Send text: `[0x01, ...text bytes]` (64-byte report)
-- Receive button: `[0x02, button_id, pressed (0/1)]`
+The firmware uses USB CDC ACM (serial) via TinyUSB with length-prefixed binary framing:
+
+```
+[0xAA] [LEN_HI] [LEN_LO] [MSG_TYPE] [PAYLOAD...] [CHECKSUM_XOR]
+```
+
+Message types:
+- `0x01` Host→Device: Display text (UTF-8 payload)
+- `0x02` Device→Host: Button event (`[button_id, pressed]`)
+- `0x03` Host→Device: Set LEDs (`[idx, R, G, B]` repeated)
+- `0x04` Host→Device: Status text (UTF-8 payload)
+- `0x05` Host→Device: Clear display
+- `0x06` Host→Device: Set button labels (`[len, label...]` x 4)
+- `0x07` Device→Host: Heartbeat (`[status]`)
+
+Note: The bridge code still uses node-hid. It needs to be updated to use serial communication.
 
 ## WebSocket Protocol
 
@@ -62,10 +76,64 @@ src/
 - Response: `{"type": "response", "id": "uuid", "action": "approve", "label": "Yes"}`
 - Error: `{"type": "error", "id": "uuid", "error": "Timeout"}`
 
-## Client Application
+## Device
 
-The corresponding client application running on the camel pad is in the ./pad directory. It is written in CircuitPython.
+### Waveshare ESP32-S3-LCD-3.16
+
+- **MCU**: ESP32-S3 with 16MB flash, octal PSRAM at 80MHz
+- **Communication**: USB CDC ACM
+- **Display**: Waveshare 3.16" 320x820 MIPI RGB (rotated 90°)
+- **Input**: ATtiny1616 Adafruit Seesaw (I2C 0x49) with 4 buttons (pins 11-14)
+- **LEDs**: 4 NeoPixels via Seesaw (pin 2)
+- **USB**: TinyUSB CDC ACM for serial communication
+
+### Firmware
+
+The firmware is in `./firmware/`, built with PlatformIO (Arduino framework on ESP-IDF).
+
+**Build**: `cd firmware && .venv/bin/platformio run`
+**Flash**: `cd firmware && .venv/bin/platformio run --target upload`
+**Monitor**: `cd firmware && .venv/bin/platformio device monitor`
+
+Note: Uses a Python 3.13 venv (`.venv/`) because ESP-IDF doesn't support Python 3.14+.
+
+Key dependencies:
+- **LovyanGFX** — Display driver (RGB parallel panel via `Panel_RGB` + `Bus_RGB`)
+- **Adafruit Seesaw Library** — Button input and NeoPixel control over I2C
+
+```
+firmware/src/
+├── main.cpp                    # setup/loop, wiring
+├── config.h                    # Pin definitions, protocol constants
+├── display/
+│   ├── display_config.h        # LovyanGFX device class + ST7701 3-wire SPI init
+│   ├── display_manager.h       # Display manager API
+│   └── display_manager.cpp     # UI layout, sprite-based rendering
+├── seesaw/
+│   ├── seesaw_manager.h        # Seesaw manager API
+│   └── seesaw_manager.cpp      # Button polling, NeoPixel control
+└── comms/
+    ├── protocol.h              # Frame format, checksum
+    ├── serial_comms.h          # Serial communication API
+    └── serial_comms.cpp        # USB CDC message parsing/sending
+```
+
+The hardware device is a `Waveshare ESP32-S3-LCD-3.16`. Documentation: https://www.waveshare.com/wiki/ESP32-S3-LCD-3.16
+
+Manufacturer examples are in `../ESP32-S3-LCD-3.16-Demo`. The ST7701 init sequence in `display_config.h` was extracted from those examples.
+
+### Pin Mapping
+
+| Interface            | Pins                    |
+| -------------------- | ----------------------- |
+| SPI (Display Config) | CLK: GPIO2, MOSI: GPIO1 |
+| I2C (Seesaw)         | SDA: GPIO15, SCL: GPIO7 |
+
+### Seesaw Pins
+
+- Pin 2: NeoPixels (x4)
+- Pin 11-14: Key01-Key04
 
 ## Claude Code Plugin
 
-The camel-pad-bridge plugin in ./camel-pad-bridge integrates with Claude Code to forward notifications to this application.
+The camel-pad-bridge plugin in ./camel-pad-bridge integrates with Claude Code to forward notifications to the application.
