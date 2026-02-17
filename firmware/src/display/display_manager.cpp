@@ -252,7 +252,7 @@ void DisplayManager::createUI() {
     _statusLabel = lv_label_create(_statusBar);
     lv_label_set_text(_statusLabel, "Ready");
     lv_obj_set_style_text_color(_statusLabel, lv_color_hex(0x00ff00), 0);
-    lv_obj_set_style_text_font(_statusLabel, &lv_font_montserrat_14, 0);
+    lv_obj_set_style_text_font(_statusLabel, FONT_STATUS, 0);
     lv_obj_align(_statusLabel, LV_ALIGN_LEFT_MID, 8, 0);
 
     // Notification text area (middle)
