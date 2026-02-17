@@ -20,7 +20,7 @@ if (command === 'list-devices') {
   for (const port of ports) {
     const vid = port.vendorId ? `0x${port.vendorId}` : '----';
     const pid = port.productId ? `0x${port.productId}` : '----';
-    console.log(`  ${port.path}  Vendor: ${vid}  Product: ${pid}  ${port.manufacturer || ''}`);
+    console.log(`  ${port.path}  Vendor: ${vid}  Product: ${pid}`);
   }
   process.exit(0);
 }
