@@ -252,7 +252,7 @@ void DisplayManager::createUI() {
     _statusLabel = lv_label_create(_statusBar);
     lv_label_set_text(_statusLabel, "Ready");
     lv_obj_set_style_text_color(_statusLabel, lv_color_hex(0x00ff00), 0);
-    lv_obj_set_style_text_font(_statusLabel, &lv_font_montserrat_14, 0);
+    lv_obj_set_style_text_font(_statusLabel, FONT_STATUS, 0);
     lv_obj_align(_statusLabel, LV_ALIGN_LEFT_MID, 8, 0);
 
     // Notification text area (middle)
@@ -262,7 +262,7 @@ void DisplayManager::createUI() {
     lv_obj_set_width(_notifLabel, SCREEN_WIDTH - 16);
     lv_obj_set_pos(_notifLabel, 8, 38);
     lv_obj_set_style_text_color(_notifLabel, lv_color_hex(0xffffff), 0);
-    lv_obj_set_style_text_font(_notifLabel, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(_notifLabel, FONT_NOTIF, 0);
 
     // Button bar (bottom 70px)
     int btnWidth = SCREEN_WIDTH / 4;
@@ -277,7 +277,7 @@ void DisplayManager::createUI() {
         char label[2] = {(char)('1' + i), '\0'};
         lv_label_set_text(_btnLabels[i], label);
         lv_obj_set_style_text_color(_btnLabels[i], lv_color_hex(0xffffff), 0);
-        lv_obj_set_style_text_font(_btnLabels[i], &lv_font_montserrat_16, 0);
+        lv_obj_set_style_text_font(_btnLabels[i], FONT_BUTTON, 0);
         lv_obj_center(_btnLabels[i]);
     }
 }
