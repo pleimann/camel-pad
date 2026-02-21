@@ -2,6 +2,7 @@ import { HarnessContext, commands } from './commands';
 import { VirtualDevice } from './virtual';
 import { WsClient } from './ws-client';
 import { SerialDevice } from '../serial/device';
+import { listPorts } from '../serial/discovery';
 import { startRepl } from './repl';
 
 async function main() {
@@ -32,14 +33,19 @@ async function main() {
   const createDevice = async (portOrMode: string) => {
     if (portOrMode === 'virtual') {
       const vdev = new VirtualDevice();
-      const result = await vdev.connect();
-      const device = Object.assign(vdev, { mode: 'virtual' }) as any;
-      return device;
+      await vdev.connect();
+      return Object.assign(vdev, { mode: 'virtual' }) as any;
+    } else if (portOrMode === 'auto') {
+      const ports = await listPorts();
+      if (ports.length === 0) throw new Error('no serial devices found — is the device connected?');
+      const resolved = ports[0].path;
+      const device = new SerialDevice({ port: resolved });
+      await device.connect();
+      return Object.assign(device, { mode: 'real', portPath: resolved }) as any;
     } else {
       const device = new SerialDevice({ port: portOrMode });
       await device.connect();
-      const result = Object.assign(device, { mode: 'real' }) as any;
-      return result;
+      return Object.assign(device, { mode: 'real', portPath: portOrMode }) as any;
     }
   };
 
@@ -103,11 +109,20 @@ async function runSingleShot(
     } else if (portPath) {
       const device = new SerialDevice({ port: portPath });
       await device.connect();
-      ctx.device = Object.assign(device, { mode: 'real' }) as any;
+      ctx.device = Object.assign(device, { mode: 'real', portPath }) as any;
       ctx.mode = 'real';
     } else {
-      console.error('error: no serial connection specified (use --port <path> or --virtual)');
-      process.exit(1);
+      const ports = await listPorts();
+      if (ports.length === 0) {
+        console.error('error: no serial devices found (use --port <path> or --virtual)');
+        process.exit(1);
+      }
+      const resolved = ports[0].path;
+      const device = new SerialDevice({ port: resolved });
+      await device.connect();
+      ctx.device = Object.assign(device, { mode: 'real', portPath: resolved }) as any;
+      ctx.mode = 'real';
+      console.log(`[auto] ${resolved}`);
     }
   }
 

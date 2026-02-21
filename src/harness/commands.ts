@@ -55,14 +55,13 @@ interface CommandEntry {
 // Command registry
 export const commands: Record<string, CommandEntry> = {
   connect: {
-    usage: 'connect <port|virtual>',
-    description: 'Connect to real serial port or create virtual device',
+    usage: 'connect [port|virtual|auto]',
+    description: 'Connect to a serial port (auto-detects if omitted)',
     handler: async (args, ctx) => {
-      if (args.length < 1) return { ok: false, error: 'usage: connect <port|virtual>' };
       if (ctx.device) return { ok: false, error: 'already connected — run "disconnect" first' };
       if (!ctx.createDevice) return { ok: false, error: 'createDevice not available' };
 
-      const portOrMode = args[0];
+      const portOrMode = args[0] ?? 'auto';
       try {
         const device = await ctx.createDevice(portOrMode);
         ctx.device = device;
@@ -72,7 +71,9 @@ export const commands: Record<string, CommandEntry> = {
           const vdev = device as VirtualDevice;
           return { ok: true, lines: [`virtual device ready at ${vdev.slavePath}`] };
         } else {
-          return { ok: true, lines: [`connected to ${portOrMode}`] };
+          const resolvedPath = (device as any).portPath ?? portOrMode;
+          ctx.portPath = resolvedPath;
+          return { ok: true, lines: [`connected to ${resolvedPath}`] };
         }
       } catch (err: any) {
         return { ok: false, error: `connection failed: ${err.message}` };

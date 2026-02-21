@@ -96,40 +96,45 @@ export async function startRepl(ctx: HarnessContext): Promise<void> {
     });
   }
 
-  // Main REPL loop
-  rl.on('line', async (input) => {
-    const line = input.trim();
-    if (!line) {
-      rl.prompt();
-      return;
-    }
+  // Main REPL loop — serialize async handlers so rapid/pasted input doesn't
+  // race (e.g. "send-text" running before "connect" has finished its await).
+  let processing = Promise.resolve();
 
-    const tokens = tokenise(line);
-    const cmdName = tokens[0];
-    const args = tokens.slice(1);
+  rl.on('line', (input) => {
+    processing = processing.then(async () => {
+      const line = input.trim();
+      if (!line) {
+        rl.prompt();
+        return;
+      }
 
-    const cmd = commands[cmdName];
-    if (!cmd) {
-      asyncPrint(rl, `unknown command: ${cmdName}`);
+      const tokens = tokenise(line);
+      const cmdName = tokens[0];
+      const args = tokens.slice(1);
+
+      const cmd = commands[cmdName];
+      if (!cmd) {
+        asyncPrint(rl, `unknown command: ${cmdName}`);
+        rl.setPrompt(buildPrompt(ctx));
+        rl.prompt();
+        return;
+      }
+
+      try {
+        const result = await cmd.handler(args, ctx);
+
+        if (result.ok) {
+          result.lines.forEach((line) => asyncPrint(rl, line));
+        } else {
+          asyncPrint(rl, `error: ${result.error}`);
+        }
+      } catch (err: any) {
+        asyncPrint(rl, `error: ${err.message}`);
+      }
+
       rl.setPrompt(buildPrompt(ctx));
       rl.prompt();
-      return;
-    }
-
-    try {
-      const result = await cmd.handler(args, ctx);
-
-      if (result.ok) {
-        result.lines.forEach((line) => asyncPrint(rl, line));
-      } else {
-        asyncPrint(rl, `error: ${result.error}`);
-      }
-    } catch (err: any) {
-      asyncPrint(rl, `error: ${err.message}`);
-    }
-
-    rl.setPrompt(buildPrompt(ctx));
-    rl.prompt();
+    });
   });
 
   rl.on('close', () => {

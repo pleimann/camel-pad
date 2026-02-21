@@ -82,9 +82,9 @@ export class SerialDevice extends EventEmitter {
   private configurePort(portPath: string): void {
     try {
       if (process.platform === 'darwin') {
-        execSync(`stty -f "${portPath}" ${SERIAL_BAUD} raw -echo -echoctl -echoke -icanon -isig -iexten -opost cs8 -cstopb -parenb`, { timeout: 5000 });
+        execSync(`stty -f "${portPath}" ${SERIAL_BAUD} raw clocal -echo -echoctl -echoke -icanon -isig -iexten -opost cs8 -cstopb -parenb`, { timeout: 5000 });
       } else {
-        execSync(`stty -F "${portPath}" ${SERIAL_BAUD} raw -echo cs8 -cstopb -parenb`, { timeout: 5000 });
+        execSync(`stty -F "${portPath}" ${SERIAL_BAUD} raw clocal -echo cs8 -cstopb -parenb`, { timeout: 5000 });
       }
     } catch (err: any) {
       // stty can hang on some USB CDC ports; log but don't fail
