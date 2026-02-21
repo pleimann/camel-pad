@@ -1,0 +1,116 @@
+import { SerialDevice } from './serial/device.js';
+import { GestureDetector } from './gesture/detector.js';
+import { ConfigWatcher } from './config/watcher.js';
+import { NotificationServer } from './websocket/server.js';
+import { validateConfig } from './config/loader.js';
+import type { NotificationMessage } from './types.js';
+
+export interface BridgeStatus {
+  connected: boolean;
+  portPath: string | null;
+  pendingCount: number;
+}
+
+export interface BridgeHandle {
+  shutdown(): void;
+  getStatus(): BridgeStatus;
+  onStatusChange(cb: (status: BridgeStatus) => void): void;
+}
+
+export async function startBridge(configPath: string): Promise<BridgeHandle> {
+  const configWatcher = new ConfigWatcher(configPath);
+  const config = configWatcher.getConfig();
+
+  const errors = validateConfig(config);
+  if (errors.length > 0) {
+    throw new Error(`Configuration errors:\n${errors.map(e => `  - ${e}`).join('\n')}`);
+  }
+
+  const serialDevice = new SerialDevice({
+    port: config.device.port,
+    vendorId: config.device.vendorId,
+    productId: config.device.productId,
+  });
+
+  const gestureDetector = new GestureDetector({
+    longPressMs: config.gestures.longPressMs,
+    doublePressMs: config.gestures.doublePressMs,
+  });
+
+  const notificationServer = new NotificationServer(config);
+
+  const statusListeners: Array<(status: BridgeStatus) => void> = [];
+  let connected = false;
+  let portPath: string | null = null;
+
+  function emitStatus() {
+    const status: BridgeStatus = {
+      connected,
+      portPath,
+      pendingCount: notificationServer.hasPending() ? 1 : 0,
+    };
+    for (const cb of statusListeners) cb(status);
+  }
+
+  // Serial button events → Gesture detector
+  serialDevice.on('button', ({ buttonId, pressed }) => {
+    gestureDetector.handleButton(buttonId, pressed);
+  });
+
+  serialDevice.on('connected', () => {
+    connected = true;
+    portPath = config.device.port ?? null;
+    emitStatus();
+  });
+
+  serialDevice.on('disconnected', () => {
+    connected = false;
+    portPath = null;
+    emitStatus();
+  });
+
+  // Gesture events → Notification server
+  gestureDetector.on('gesture', ({ buttonId, gesture }) => {
+    console.log(`Gesture: ${buttonId} ${gesture}`);
+    const handled = notificationServer.handleGesture(buttonId, gesture);
+    if (!handled && !notificationServer.hasPending()) {
+      console.log('No pending notifications');
+    }
+  });
+
+  // Notification events → Serial display
+  notificationServer.on('notification', (message: NotificationMessage) => {
+    console.log(`Notification: ${message.text}`);
+    serialDevice.sendText(message.text);
+  });
+
+  // Config reload events
+  configWatcher.on('reload', (newConfig) => {
+    console.log('Applying new configuration...');
+    gestureDetector.updateConfig({
+      longPressMs: newConfig.gestures.longPressMs,
+      doublePressMs: newConfig.gestures.doublePressMs,
+    });
+    notificationServer.updateConfig(newConfig);
+  });
+
+  // Start services
+  configWatcher.start();
+  notificationServer.start();
+  serialDevice.connect();
+
+  return {
+    shutdown() {
+      configWatcher.stop();
+      notificationServer.stop();
+      serialDevice.disconnect();
+      gestureDetector.reset();
+    },
+    getStatus(): BridgeStatus {
+      return { connected, portPath, pendingCount: notificationServer.hasPending() ? 1 : 0 };
+    },
+    onStatusChange(cb: (status: BridgeStatus) => void) {
+      statusListeners.push(cb);
+    },
+  };
+}

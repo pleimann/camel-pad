@@ -1,0 +1,159 @@
+import { execSync } from 'child_process';
+import { readFileSync, writeFileSync } from 'fs';
+import { stringify } from 'yaml';
+import { loadConfig } from '../config/loader.js';
+import { listPorts } from '../serial/discovery.js';
+import type { Config } from '../types.js';
+
+// Embed the settings HTML as a Bun asset (works in dev mode and after bun --compile)
+import settingsHtmlPath from '../../assets/settings.html' with { type: 'file' };
+
+export interface SettingsServerHandle {
+  stop(): void;
+}
+
+/**
+ * Opens a local settings web page in the user's default browser.
+ * Starts a temporary HTTP server on a random port, then opens it.
+ * The server shuts down automatically when the user saves or after a timeout.
+ */
+export async function openSettings(
+  configPath: string,
+  onSaved?: () => void,
+): Promise<SettingsServerHandle> {
+  const settingsHtml = readFileSync(settingsHtmlPath, 'utf8');
+
+  let idleTimer: ReturnType<typeof setTimeout> | null = null;
+  let server: ReturnType<typeof Bun.serve> | null = null;
+
+  function resetIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => server?.stop(), 5 * 60 * 1000);
+  }
+
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  server = Bun.serve({
+    port: 0, // OS assigns a free port
+    async fetch(req) {
+      resetIdleTimer();
+      const url = new URL(req.url);
+
+      // Handle CORS preflight
+      if (req.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: corsHeaders });
+      }
+
+      if (url.pathname === '/') {
+        return new Response(settingsHtml, {
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        });
+      }
+
+      if (url.pathname === '/api/config') {
+        if (req.method === 'GET') {
+          const config = loadConfig(configPath);
+          return Response.json(config);
+        }
+
+        if (req.method === 'POST') {
+          try {
+            const body = await req.json() as Partial<Config>;
+            const yaml = buildYaml(body);
+            writeFileSync(configPath, yaml, 'utf8');
+            onSaved?.();
+            return new Response('ok');
+          } catch (err: any) {
+            return new Response(err.message, { status: 400 });
+          }
+        }
+      }
+
+      if (url.pathname === '/api/devices') {
+        try {
+          const ports = await listPorts();
+          return Response.json(ports);
+        } catch (err: any) {
+          return new Response(err.message, { status: 500 });
+        }
+      }
+
+      if (url.pathname === '/api/close') {
+        setTimeout(() => server?.stop(), 200);
+        return new Response('ok');
+      }
+
+      return new Response('Not found', { status: 404 });
+    },
+  });
+
+  resetIdleTimer();
+
+  const url = `http://localhost:${server.port}`;
+  console.log('Settings server:', url);
+  openBrowser(url);
+
+  return {
+    stop() {
+      if (idleTimer) clearTimeout(idleTimer);
+      server?.stop();
+    },
+  };
+}
+
+function openBrowser(url: string): void {
+  try {
+    if (process.platform === 'darwin') {
+      execSync(`open "${url}"`);
+    } else if (process.platform === 'win32') {
+      execSync(`start "" "${url}"`);
+    } else {
+      execSync(`xdg-open "${url}"`);
+    }
+  } catch (err) {
+    console.warn('Could not open browser automatically. Open this URL manually:', url);
+  }
+}
+
+/**
+ * Converts a partial Config object (from the settings form) back to YAML.
+ * Only writes fields that are set; preserves the simple format.
+ */
+function buildYaml(config: Partial<Config>): string {
+  const out: Record<string, any> = {};
+
+  if (config.device) {
+    out.device = {};
+    if (config.device.port) out.device.port = config.device.port;
+    if (config.device.vendorId) out.device.vendorId = `0x${config.device.vendorId.toString(16)}`;
+    if (config.device.productId) out.device.productId = `0x${config.device.productId.toString(16)}`;
+  }
+
+  if (config.server) {
+    out.server = {
+      port: config.server.port,
+      host: config.server.host,
+    };
+  }
+
+  if (config.gestures) {
+    out.gestures = {
+      longPressMs: config.gestures.longPressMs,
+      doublePressMs: config.gestures.doublePressMs,
+    };
+  }
+
+  if (config.defaults) {
+    out.defaults = { timeoutMs: config.defaults.timeoutMs };
+  }
+
+  if (config.keys && Object.keys(config.keys).length > 0) {
+    out.keys = config.keys;
+  }
+
+  return stringify(out);
+}

@@ -8,7 +8,12 @@
     "start": "bun run src/index.ts",
     "dev": "bun --watch src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target node",
-    "harness": "bun run src/harness/index.ts"
+    "harness": "bun run src/harness/index.ts",
+    "start:tray": "bun run src/tray.ts",
+    "dev:tray": "bun --watch src/tray.ts",
+    "build:tray:arm64": "bun build --compile --target bun-darwin-arm64 --minify --outfile dist/camel-pad-tray-arm64 src/tray.ts",
+    "build:tray:x64": "bun build --compile --target bun-darwin-x64 --minify --outfile dist/camel-pad-tray-x64 src/tray.ts",
+    "bundle:app": "bash scripts/build-app.sh"
   },
   "keywords": ["macropad", "serial", "notifications"],
   "license": "MIT",
@@ -19,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "@types/ws": "^8.5.10"
+    "@types/ws": "^8.5.10",
+    "systray2": "^2.1.4"
   }
 }
