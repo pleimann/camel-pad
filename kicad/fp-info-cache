@@ -1,4 +1,4 @@
-27257123082512860
+27260667076067062
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -107905,13 +107905,6 @@ Varistor VF
 2
 2
 camelpad
-JST_SH_BM03B-SRSS-TB_1x03-1MP_P1.00mm_Vertical
-JST SH series connector, BM03B-SRSS-TB (http://www.jst-mfg.com/product/pdf/eng/eSH.pdf), generated with kicad-footprint-generator
-connector JST SH vertical
-0
-5
-4
-camelpad
 JST_SH_BM04B-SRSS-TB_1x04-1MP_P1.00mm_Vertical
 JST SH series connector, BM04B-SRSS-TB (http://www.jst-mfg.com/product/pdf/eng/eSH.pdf), generated with kicad-footprint-generator
 connector JST SH vertical
@@ -107933,12 +107926,33 @@ LED-SMD_4P-L2.0-W2.0-TL_WS2812B-2020
 4
 4
 camelpad
+R_0402_1005Metric
+Resistor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator
+resistor
+0
+2
+2
+camelpad
+R_0603_1608Metric
+Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator
+resistor
+0
+2
+2
+camelpad
 R_Array_Convex_4x0603
 Chip Resistor Network, ROHM MNR14 (see mnr_g.pdf)
 resistor array
 0
 8
 8
+camelpad
+USB-C-SMD_GT-USB-7055E
+
+
+0
+21
+17
 camelpad
 USB-C-SMD_TYPE-C-6PIN-2MD-073
 

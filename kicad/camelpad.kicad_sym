@@ -515,237 +515,6 @@
 		)
 		(embedded_fonts no)
 	)
-	(symbol "AVR-UPDI-6"
-		(pin_names
-			(offset 1.016)
-		)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(property "Reference" "J"
-			(at -6.35 8.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "AVR-UPDI-6"
-			(at 0 8.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "camelpad:JST_SH_BM03B-SRSS-TB_1x03-1MP_P1.00mm_Vertical"
-			(at -6.35 -1.27 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.microchip.com/webdoc/GUID-9D10622A-5C16-4405-B092-1BDD437B4976/index.html?GUID-9B349315-2842-4189-B88C-49F4E1055D7F"
-			(at -32.385 -13.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Atmel 6-pin UPDI connector"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ki_keywords" "AVR UPDI Connector"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ki_fp_filters" "IDC?Header*2x03* Pin?Header*2x03*"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(symbol "AVR-UPDI-6_0_1"
-			(rectangle
-				(start -2.667 7.62)
-				(end -2.413 6.858)
-				(stroke
-					(width 0)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(rectangle
-				(start -2.667 -6.858)
-				(end -2.413 -7.62)
-				(stroke
-					(width 0)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(rectangle
-				(start 7.62 7.62)
-				(end -7.62 -7.62)
-				(stroke
-					(width 0.254)
-					(type default)
-				)
-				(fill
-					(type background)
-				)
-			)
-			(rectangle
-				(start 7.62 2.667)
-				(end 6.858 2.413)
-				(stroke
-					(width 0)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-		)
-		(symbol "AVR-UPDI-6_1_1"
-			(pin passive line
-				(at -2.54 10.16 270)
-				(length 2.54)
-				(name "VCC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "2"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -2.54 -10.16 90)
-				(length 2.54)
-				(name "GND"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "3"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin no_connect line
-				(at 7.62 0 180)
-				(length 2.54)
-				(hide yes)
-				(name "NC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "3"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin no_connect line
-				(at 7.62 -2.54 180)
-				(length 2.54)
-				(hide yes)
-				(name "NC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "4"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin no_connect line
-				(at 7.62 -5.08 180)
-				(length 2.54)
-				(hide yes)
-				(name "NC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "5"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 10.16 2.54 180)
-				(length 2.54)
-				(name "DATA"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-		)
-		(embedded_fonts no)
-	)
 	(symbol "GT-USB-7055E"
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1134,7 +903,7 @@
 		)
 		(embedded_fonts no)
 	)
-	(symbol "STEMMA_I2C_QTRA"
+	(symbol "STEMMA_I2C_JST_SH_4P"
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -1185,7 +954,7 @@
 				(hide yes)
 			)
 		)
-		(symbol "STEMMA_I2C_QTRA_1_0"
+		(symbol "STEMMA_I2C_JST_SH_4P_1_0"
 			(polyline
 				(pts
 					(xy -3.81 7.62) (xy -3.81 -5.08)
@@ -1495,12 +1264,12 @@
 		)
 		(embedded_fonts no)
 	)
-	(symbol "UPDI_JST_SH_3P"
+	(symbol "UPDI_JST_SH_4P"
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "CONN"
-			(at -3.556 9.144 0)
+			(at -3.556 10.16 0)
 			(effects
 				(font
 					(size 1.778 1.5113)
@@ -1519,8 +1288,8 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "camelpad:JST_SH_BM04B-SRSS-TB_1x03-1MP_P1.00mm_Vertical"
-			(at -1.524 12.954 0)
+		(property "Footprint" "camelpad:JST_SH_BM04B-SRSS-TB_1x04-1MP_P1.00mm_Vertical"
+			(at -1.524 13.97 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1546,10 +1315,10 @@
 				(hide yes)
 			)
 		)
-		(symbol "UPDI_JST_SH_3P_1_0"
+		(symbol "UPDI_JST_SH_4P_1_0"
 			(polyline
 				(pts
-					(xy -3.81 7.62) (xy -3.81 -2.54)
+					(xy -3.81 2.54) (xy -3.81 -10.16)
 				)
 				(stroke
 					(width 0.4064)
@@ -1561,7 +1330,7 @@
 			)
 			(polyline
 				(pts
-					(xy -3.81 -2.54) (xy 3.81 -2.54)
+					(xy -3.81 -10.16) (xy 3.81 -10.16)
 				)
 				(stroke
 					(width 0.4064)
@@ -1573,7 +1342,7 @@
 			)
 			(polyline
 				(pts
-					(xy 3.81 7.62) (xy -3.81 7.62)
+					(xy 3.81 2.54) (xy -3.81 2.54)
 				)
 				(stroke
 					(width 0.4064)
@@ -1585,7 +1354,7 @@
 			)
 			(polyline
 				(pts
-					(xy 3.81 -2.54) (xy 3.81 7.62)
+					(xy 3.81 -10.16) (xy 3.81 2.54)
 				)
 				(stroke
 					(width 0.4064)
@@ -1593,12 +1362,48 @@
 				)
 				(fill
 					(type none)
+				)
+			)
+			(pin passive non_logic
+				(at 0 7.62 0)
+				(length 2)
+				(name "MP"
+					(effects
+						(font
+							(size 1.5 1.5)
+						)
+					)
+				)
+				(number "5"
+					(effects
+						(font
+							(size 0 0)
+						)
+					)
+				)
+			)
+			(pin passive non_logic
+				(at 0 5.08 0)
+				(length 2)
+				(name "MP"
+					(effects
+						(font
+							(size 1.5 1.5)
+						)
+					)
+				)
+				(number "6"
+					(effects
+						(font
+							(size 0 0)
+						)
+					)
 				)
 			)
 			(pin power_in inverted
-				(at 0 5.08 0)
+				(at 0 0 0)
 				(length 3.4)
-				(name "UPDI"
+				(name "GND"
 					(effects
 						(font
 							(size 1.524 1.524)
@@ -1614,7 +1419,7 @@
 				)
 			)
 			(pin power_in inverted
-				(at 0 2.54 0)
+				(at 0 -2.54 0)
 				(length 3.4)
 				(name "V+"
 					(effects
@@ -1631,10 +1436,10 @@
 					)
 				)
 			)
-			(pin bidirectional inverted
-				(at 0 0 0)
+			(pin input inverted
+				(at 0 -5.08 0)
 				(length 3.4)
-				(name "GND"
+				(name "TX"
 					(effects
 						(font
 							(size 1.524 1.524)
@@ -1649,35 +1454,17 @@
 					)
 				)
 			)
-			(pin passive non_logic
+			(pin output inverted
 				(at 0 -7.62 0)
-				(length 2)
-				(name "MP"
+				(length 3.4)
+				(name "RX"
 					(effects
 						(font
-							(size 1.5 1.5)
+							(size 1.524 1.524)
 						)
 					)
 				)
-				(number "MP"
-					(effects
-						(font
-							(size 0 0)
-						)
-					)
-				)
-			)
-			(pin passive non_logic
-				(at 0 -10.16 0)
-				(length 2)
-				(name "MP"
-					(effects
-						(font
-							(size 1.5 1.5)
-						)
-					)
-				)
-				(number "MP"
+				(number "4"
 					(effects
 						(font
 							(size 0 0)
