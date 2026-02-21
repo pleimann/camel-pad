@@ -87,7 +87,7 @@ async function main() {
       ],
     },
     (action: ClickAction) => {
-      const id = action.item.__id;
+      const id = action.item?.__id ?? (action as any).__id;
       if (id === ITEM_SETTINGS) {
         onSettingsClick();
       } else if (id === ITEM_QUIT) {
