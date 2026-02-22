@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import { EventEmitter } from 'events';
 import {
   MSG_BUTTON, MSG_SET_LEDS,
-  MSG_DISPLAY_TEXT, MSG_STATUS, MSG_CLEAR, MSG_SET_LABELS, MSG_HEARTBEAT,
+  MSG_DISPLAY_TEXT, MSG_STATUS, MSG_CLEAR, MSG_SET_LABELS, MSG_HEARTBEAT, MSG_PING,
   SERIAL_BAUD,
 } from '../types.js';
 import { buildFrame, FrameParser } from './protocol.js';
@@ -192,6 +192,10 @@ export class SerialDevice extends EventEmitter {
 
   clearDisplay(): boolean {
     return this.sendMessage(MSG_CLEAR);
+  }
+
+  sendPing(): boolean {
+    return this.sendMessage(MSG_PING);
   }
 
   private sendMessage(msgType: number, payload?: Buffer): boolean {

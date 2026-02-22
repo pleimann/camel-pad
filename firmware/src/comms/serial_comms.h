@@ -18,11 +18,12 @@ public:
 
     bool bridgeConnected() const { return _bridgeConnected; }
 
-    void onDisplayText(TextCallback cb)     { _onDisplayText = cb; }
-    void onStatusText(TextCallback cb)      { _onStatusText = cb; }
-    void onSetLeds(LedsCallback cb)         { _onSetLeds = cb; }
-    void onClearDisplay(VoidCallback cb)    { _onClearDisplay = cb; }
+    void onDisplayText(TextCallback cb)       { _onDisplayText = cb; }
+    void onStatusText(TextCallback cb)        { _onStatusText = cb; }
+    void onSetLeds(LedsCallback cb)           { _onSetLeds = cb; }
+    void onClearDisplay(VoidCallback cb)      { _onClearDisplay = cb; }
     void onSetButtonLabels(LabelsCallback cb) { _onSetLabels = cb; }
+    void onBridgeDisconnected(VoidCallback cb){ _onBridgeDisconnected = cb; }
 
 private:
     void processMessage(uint8_t msgType, const uint8_t* payload, uint16_t len);
@@ -40,13 +41,16 @@ private:
     uint8_t    _buffer[MAX_MSG_LEN];
     uint16_t   _bodyLen = 0;
     uint16_t   _bodyIdx = 0;
-    unsigned long _lastByteTime = 0;  // Timeout tracking
-    static const unsigned long FRAME_TIMEOUT_MS = 500;  // Reset if no complete frame in 500ms
+    unsigned long _lastByteTime = 0;  // Timeout tracking for frame parser
+    unsigned long _lastMsgTime  = 0;  // Time of last complete message received
+    static const unsigned long FRAME_TIMEOUT_MS  = 500;   // Reset parser if no complete frame in 500ms
+    static const unsigned long BRIDGE_TIMEOUT_MS = 15000; // Declare disconnected after 15s silence
 
     bool           _bridgeConnected = false;
-    TextCallback   _onDisplayText = nullptr;
-    TextCallback   _onStatusText  = nullptr;
-    LedsCallback   _onSetLeds     = nullptr;
-    VoidCallback   _onClearDisplay = nullptr;
-    LabelsCallback _onSetLabels   = nullptr;
+    TextCallback   _onDisplayText        = nullptr;
+    TextCallback   _onStatusText         = nullptr;
+    LedsCallback   _onSetLeds            = nullptr;
+    VoidCallback   _onClearDisplay       = nullptr;
+    LabelsCallback _onSetLabels          = nullptr;
+    VoidCallback   _onBridgeDisconnected = nullptr;
 };

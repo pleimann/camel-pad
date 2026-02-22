@@ -13,6 +13,13 @@ void SerialComms::poll() {
         _state = WAIT_START;
     }
 
+    // Detect bridge disconnect: connected but no message received within timeout
+    if (_bridgeConnected && _lastMsgTime != 0 && (millis() - _lastMsgTime) > BRIDGE_TIMEOUT_MS) {
+        _bridgeConnected = false;
+        _lastMsgTime = 0;
+        if (_onBridgeDisconnected) _onBridgeDisconnected();
+    }
+
     while (Serial.available()) {
         uint8_t byte = Serial.read();
         _lastByteTime = millis();  // Track when we received data
@@ -60,6 +67,7 @@ void SerialComms::poll() {
 
 void SerialComms::processMessage(uint8_t msgType, const uint8_t* payload, uint16_t len) {
     _bridgeConnected = true;
+    _lastMsgTime = millis();
     switch (msgType) {
     case MSG_DISPLAY_TEXT:
         if (_onDisplayText && len > 0) {
@@ -84,6 +92,9 @@ void SerialComms::processMessage(uint8_t msgType, const uint8_t* payload, uint16
             _onClearDisplay();
         }
         break;
+
+    case MSG_PING:
+        break;  // keepalive — timestamp already updated above
 
     case MSG_SET_LABELS: {
         if (_onSetLabels && len > 0) {

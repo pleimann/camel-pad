@@ -320,9 +320,10 @@ void DisplayManager::unlock() {
     xSemaphoreGive(_lvglMux);
 }
 
-void DisplayManager::setStatusText(const char* text) {
+void DisplayManager::setStatusText(const char* text, uint32_t color) {
     if (lock()) {
         lv_label_set_text(_statusLabel, text);
+        lv_obj_set_style_text_color(_statusLabel, lv_color_hex(color), 0);
         unlock();
     }
 }

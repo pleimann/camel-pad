@@ -47,6 +47,7 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
   const statusListeners: Array<(status: BridgeStatus) => void> = [];
   let connected = false;
   let portPath: string | null = null;
+  let pingInterval: ReturnType<typeof setInterval> | null = null;
 
   function emitStatus() {
     const status: BridgeStatus = {
@@ -66,11 +67,14 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
     connected = true;
     portPath = config.device.port ?? null;
     emitStatus();
+    serialDevice.sendStatus('Connected');
+    pingInterval = setInterval(() => serialDevice.sendPing(), 5000);
   });
 
   serialDevice.on('disconnected', () => {
     connected = false;
     portPath = null;
+    if (pingInterval) { clearInterval(pingInterval); pingInterval = null; }
     emitStatus();
   });
 
@@ -106,6 +110,7 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
 
   return {
     shutdown() {
+      if (pingInterval) { clearInterval(pingInterval); pingInterval = null; }
       configWatcher.stop();
       notificationServer.stop();
       serialDevice.disconnect();

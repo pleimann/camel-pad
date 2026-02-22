@@ -66,6 +66,7 @@ export const MSG_STATUS = 0x04;
 export const MSG_CLEAR = 0x05;
 export const MSG_SET_LABELS = 0x06;
 export const MSG_HEARTBEAT = 0x07;
+export const MSG_PING      = 0x08; // Host→Device: keepalive (no payload)
 
 // Gesture types
 export type GestureType = 'press' | 'doublePress' | 'longPress';

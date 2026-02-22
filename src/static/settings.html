@@ -279,7 +279,7 @@
          No fixed label column — labels are inline where needed.       */
       .ctrl-field {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 8px;
         padding: 7px 0;
       }
@@ -308,10 +308,18 @@
         box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
       }
 
+      .ctrl-field .field-controls {
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
       .ctrl-field textarea {
         flex: 1;
         min-width: 0;
-        height: 52px;
+        height: 100px;
         border: 1px solid #d2d2d7;
         border-radius: 6px;
         padding: 6px 8px;
@@ -485,37 +493,13 @@
         <h2>Display</h2>
 
         <div class="ctrl-field">
-          <textarea
-            id="ctrl-text"
-            placeholder="Text to show on display…"
-          ></textarea>
-          <div
-            style="
-              display: flex;
-              flex-direction: column;
-              align-items: flex-start;
-            "
-          >
-            <button
-              type="button"
-              class="btn btn-secondary btn-small"
-              onclick="sendDisplayText()"
-            >
-              Send
-            </button>
-            <span class="ctrl-fb" id="fb-text"></span>
-          </div>
-        </div>
-
-        <div class="ctrl-field">
-          <input type="text" id="ctrl-status" placeholder="Status bar text…" />
-          <div
-            style="
-              display: flex;
-              flex-direction: column;
-              align-items: flex-start;
-            "
-          >
+          <input
+            type="text"
+            id="ctrl-status"
+            style="color: green"
+            placeholder="Status bar text…"
+          />
+          <div class="field-controls">
             <button
               type="button"
               class="btn btn-secondary btn-small"
@@ -524,6 +508,23 @@
               Send
             </button>
             <span class="ctrl-fb" id="fb-status"></span>
+          </div>
+        </div>
+
+        <div class="ctrl-field">
+          <textarea
+            id="ctrl-text"
+            placeholder="Text to show on display…"
+          ></textarea>
+          <div class="field-controls">
+            <button
+              type="button"
+              class="btn btn-secondary btn-small"
+              onclick="sendDisplayText()"
+            >
+              Send
+            </button>
+            <span class="ctrl-fb" id="fb-text"></span>
           </div>
         </div>
 

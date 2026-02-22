@@ -9,7 +9,7 @@
 class DisplayManager {
 public:
     bool begin();
-    void setStatusText(const char* text);
+    void setStatusText(const char* text, uint32_t color = 0x00ff00);
     void setNotificationText(const char* text);
     void setButtonLabels(const char* btn1, const char* btn2,
                          const char* btn3, const char* btn4);

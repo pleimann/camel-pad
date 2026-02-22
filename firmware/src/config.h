@@ -82,6 +82,7 @@
 #define MSG_CLEAR 0x05
 #define MSG_SET_LABELS 0x06
 #define MSG_HEARTBEAT 0x07
+#define MSG_PING      0x08  // Host→Device: keepalive (no payload)
 
 #define FRAME_START_BYTE 0xAA
 #define MAX_MSG_LEN 512

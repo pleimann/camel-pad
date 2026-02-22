@@ -61,8 +61,15 @@ static void onSetLeds(const uint8_t* data, uint16_t len) {
     seesaw.showPixels();
 }
 
+static void onBridgeDisconnected() {
+    display.setStatusText("DISCONNECTED", 0xff0000);
+    display.update();
+}
+
 static void onClearDisplay() {
-    display.showIdleScreen();
+    display.setStatusText("Ready");
+    display.setNotificationText("");
+    display.setButtonLabels("1", "2", "3", "4");
     display.update();
 }
 
@@ -107,6 +114,7 @@ void setup() {
     comms.onSetLeds(onSetLeds);
     comms.onClearDisplay(onClearDisplay);
     comms.onSetButtonLabels(onSetButtonLabels);
+    comms.onBridgeDisconnected(onBridgeDisconnected);
     Serial.println("[3/3] Comms OK");
 
     seesaw.clearPixels();
