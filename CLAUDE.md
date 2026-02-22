@@ -5,18 +5,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Development Commands
 
 - `bun install` - Install dependencies
-- `bun run start` - Run the application
-- `bun run dev` - Run with watch mode (auto-restart on changes)
-- `bun run build` - Build for production
-- `bun run src/index.ts list-devices` - List available serial devices
-- `bun run src/index.ts config.yaml` - Run with specific config file
+- `bun run start` - Run the tray app
+- `bun run dev` - Run tray app with watch mode (auto-restart on changes)
+- `bun run bundle:app` - Build `dist/camel-pad.app` for macOS distribution
+
+Config is stored at `~/Library/Application Support/camel-pad/config.yaml` (macOS).
+On first run with no config, the settings UI opens automatically in the browser.
 
 ## Architecture
 
 ```
 src/
-├── index.ts              # Entry point, CLI, wiring
+├── tray.ts               # Entry point — macOS menu bar app
+├── bridge.ts             # Bridge startup logic (wires serial/gesture/websocket)
 ├── types.ts              # Shared type definitions, protocol constants
+├── tray/
+│   ├── systray-spawn.ts  # Go binary spawner for native tray icon
+│   ├── config-store.ts   # Platform-aware config path resolution
+│   └── settings-server.ts# Embedded HTTP server for settings UI
 ├── serial/
 │   ├── device.ts         # Serial connection, read/write, reconnection
 │   ├── discovery.ts      # Serial port enumeration by vendor/product ID

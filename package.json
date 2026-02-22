@@ -2,12 +2,14 @@
   "name": "camel-pad",
   "version": "0.1.0",
   "description": "Bridge for macropad notifications with Claude Code",
-  "main": "src/index.ts",
+  "main": "src/tray.ts",
   "type": "module",
   "scripts": {
-    "start": "bun run src/index.ts",
-    "dev": "bun --watch src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target node",
+    "start": "bun run src/tray.ts",
+    "dev": "bun --watch src/tray.ts",
+    "build:arm64": "bun build --compile --target bun-darwin-arm64 --minify --outfile dist/camel-pad-tray-arm64 src/tray.ts",
+    "build:x64": "bun build --compile --target bun-darwin-x64 --minify --outfile dist/camel-pad-tray-x64 src/tray.ts",
+    "bundle:app": "bash scripts/build-app.sh",
     "harness": "bun run src/harness/index.ts"
   },
   "keywords": ["macropad", "serial", "notifications"],
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "@types/ws": "^8.5.10"
+    "@types/ws": "^8.5.10",
+    "systray2": "^2.1.4"
   }
 }
