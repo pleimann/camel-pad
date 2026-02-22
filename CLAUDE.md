@@ -20,7 +20,7 @@ src/
 ├── bridge.ts             # Bridge startup logic (wires serial/gesture/websocket)
 ├── types.ts              # Shared type definitions, protocol constants
 ├── tray/
-│   ├── systray-spawn.ts  # Go binary spawner for native tray icon
+│   ├── systray-spawn.ts  # Binary spawner for native tray icon
 │   ├── config-store.ts   # Platform-aware config path resolution
 │   └── settings-server.ts# Embedded HTTP server for settings UI
 ├── serial/

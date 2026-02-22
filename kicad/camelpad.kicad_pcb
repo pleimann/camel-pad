@@ -188,7 +188,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "~"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -200,7 +200,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Push button switch, generic, two pins"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -215,6 +215,7 @@
 		(path "/0c500f27-7905-4fb8-8f20-4164a6b7a6d8")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
+		(attr exclude_from_bom)
 		(fp_line
 			(start -9.525 8.255)
 			(end -9.525 -8.255)
@@ -1762,15 +1763,16 @@
 			)
 		)
 	)
-	(footprint "Diode_SMD:D_SOD-323"
+	(footprint "camelpad:D_SOD-323"
 		(layer "F.Cu")
 		(uuid "1e567ad6-537c-40b3-bfb3-c434705287cc")
 		(at 109.75 95.9825 180)
 		(descr "SOD-323")
 		(tags "SOD-323")
 		(property "Reference" "D6"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "1ba4a50c-5979-4dac-b007-f160d02e22f8")
 			(effects
 				(font
@@ -1780,17 +1782,18 @@
 			)
 		)
 		(property "Value" "1N4148"
-			(at 0.1 1.9 0)
-			(layer "F.Fab")
+			(at 0 -1.8175 180)
+			(layer "F.SilkS")
 			(uuid "268f2aa0-81c5-4f80-aff2-d537d604c9e5")
 			(effects
 				(font
 					(size 1 1)
 					(thickness 0.15)
+					(italic yes)
 				)
 			)
 		)
-		(property "Datasheet" "https://www.vishay.com/docs/85751/1n4148ws.pdf"
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1803,7 +1806,7 @@
 				)
 			)
 		)
-		(property "Description" "75V 0.15A Fast switching Diode, SOD-323"
+		(property "Description" "100V 0.15A standard switching diode, DO-35"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1821,7 +1824,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "bdcffe86-c121-4606-9ded-eb89cca5187b")
+			(uuid "2b8c4c47-7876-420f-8ba7-ebf031bfad5a")
 			(effects
 				(font
 					(size 1 1)
@@ -1834,7 +1837,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "90034184-d102-482e-97ae-20ca6dfc3e9c")
+			(uuid "bab1b196-5387-4a7d-90ac-2c18ca425704")
 			(effects
 				(font
 					(size 1 1)
@@ -1842,7 +1845,7 @@
 				)
 			)
 		)
-		(property ki_fp_filters "D*SOD?323*")
+		(property ki_fp_filters "D*DO?35*")
 		(path "/a0b1980b-df0c-4d4c-960c-cc3605be45cd")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
@@ -1855,7 +1858,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "53f69236-b8f2-4114-905c-e5e5251796cb")
+			(uuid "e37e1d88-45c8-4feb-b06c-4249aab56e5d")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -1865,7 +1868,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "cb646276-c938-463a-b319-9bde3897d720")
+			(uuid "af0d9fd1-3cea-4ace-829e-56bdb1a3ea62")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -1875,7 +1878,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "83aa2cba-375d-4b3a-add5-df477d55a2ac")
+			(uuid "a137769a-ac21-48fc-a17f-95f2fe2a2142")
 		)
 		(fp_line
 			(start 1.6 -0.95)
@@ -1885,7 +1888,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "7972c608-a1c4-419e-ab4e-6963cf7dfd01")
+			(uuid "c20cf51d-662d-442e-a8a5-85fda55b370b")
 		)
 		(fp_line
 			(start -1.6 0.95)
@@ -1895,7 +1898,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "b8eca087-536a-4a76-9d4e-8285e505ee02")
+			(uuid "7f864d59-28ef-4d31-a818-ff5d5526fa22")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -1905,7 +1908,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "a9b0704b-710f-4aa8-8952-c530f2bd016c")
+			(uuid "bfa6c751-d959-40c6-b65c-40fca17fad6f")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -1915,7 +1918,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "6d7a973e-63af-40ca-a2a0-3ae69a003386")
+			(uuid "dc8bdb7f-df41-447b-8af0-e9f2eda3e711")
 		)
 		(fp_line
 			(start 0.9 0.7)
@@ -1925,7 +1928,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "2a546ff7-17da-46ec-84a3-91784d473513")
+			(uuid "5d5ea84e-41ab-4d24-8419-e3e870527087")
 		)
 		(fp_line
 			(start 0.9 -0.7)
@@ -1935,7 +1938,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "e0f9e48c-0de0-413d-8943-82be7c9953dd")
+			(uuid "f25f2c53-9a0c-4205-9976-a4f6b2840c76")
 		)
 		(fp_line
 			(start 0.2 0.35)
@@ -1945,7 +1948,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "dab9de81-4b6b-47ac-a1f2-f7d435e356c4")
+			(uuid "0b1ba753-d0ee-4173-beb8-7092f932eec7")
 		)
 		(fp_line
 			(start 0.2 0)
@@ -1955,7 +1958,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "5e203688-63f4-4352-8f2f-5b13a37a23e6")
+			(uuid "443c6191-d36d-468c-9556-62373ed5a808")
 		)
 		(fp_line
 			(start 0.2 -0.35)
@@ -1965,7 +1968,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "51ad08bf-875c-4f22-91ad-93b665e4aaa8")
+			(uuid "5f6833b9-b140-4f4e-9e68-72234fc687ed")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -1975,7 +1978,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "d1a54b2d-e388-4925-b962-1ee067f80270")
+			(uuid "19c963a9-e799-45e4-861d-92347a03fc7c")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -1985,7 +1988,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "6110902b-21ab-4e81-b31e-d93cdc1170e5")
+			(uuid "25a5275f-2a71-4439-b619-a691e1a697e8")
 		)
 		(fp_line
 			(start -0.3 -0.35)
@@ -1995,7 +1998,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "0c7ac97e-915c-4679-98a0-4d536805e197")
+			(uuid "bac925c9-7e6f-4369-9ad5-c35b4156d3a3")
 		)
 		(fp_line
 			(start -0.9 0.7)
@@ -2005,7 +2008,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "b23a256e-22a3-4835-b395-02320c8b0433")
+			(uuid "b25832c3-ff88-4934-bf0b-11ad530f40d5")
 		)
 		(fp_line
 			(start -0.9 -0.7)
@@ -2015,10 +2018,10 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "2f3e8d41-23dc-4894-98d0-a8da2e585483")
+			(uuid "5d75bafd-0cf1-4a15-ba4b-ae260b6c383c")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.Fab")
 			(uuid "ba0a1fbd-3f9f-4f6a-999c-4ff12805b7f2")
 			(effects
@@ -3668,7 +3671,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "~"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3680,7 +3683,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Push button switch, generic, two pins"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3695,6 +3698,7 @@
 		(path "/d33422d8-ffb6-46b4-8583-a98f666418ed")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
+		(attr exclude_from_bom)
 		(fp_line
 			(start -9.525 8.255)
 			(end -9.525 -8.255)
@@ -4982,15 +4986,16 @@
 			)
 		)
 	)
-	(footprint "Diode_SMD:D_SOD-323"
+	(footprint "camelpad:D_SOD-323"
 		(layer "F.Cu")
 		(uuid "761a182a-1129-41e8-bbbe-e6b1489f8591")
 		(at 100.31 68.25 180)
 		(descr "SOD-323")
 		(tags "SOD-323")
 		(property "Reference" "D2"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "9d6f36c8-54d6-4cc7-b619-49572fae105a")
 			(effects
 				(font
@@ -5000,17 +5005,18 @@
 			)
 		)
 		(property "Value" "1N4148"
-			(at 0.1 1.9 0)
+			(at 0 -2.05 180)
 			(layer "F.SilkS")
 			(uuid "b5a48de1-ac71-40f0-8584-ea9c2e40b7de")
 			(effects
 				(font
 					(size 1 1)
 					(thickness 0.15)
+					(italic yes)
 				)
 			)
 		)
-		(property "Datasheet" "https://www.vishay.com/docs/85751/1n4148ws.pdf"
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -5023,7 +5029,7 @@
 				)
 			)
 		)
-		(property "Description" "75V 0.15A Fast switching Diode, SOD-323"
+		(property "Description" "100V 0.15A standard switching diode, DO-35"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -5041,7 +5047,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "5b5fa0d7-0e84-4307-b388-84dac6e83a02")
+			(uuid "1eadb33e-d34e-4848-8c1c-ab8bf6c5cb8d")
 			(effects
 				(font
 					(size 1 1)
@@ -5054,7 +5060,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "29d1abb1-3c4b-45e8-8011-d6a8e8964958")
+			(uuid "228a8f2d-57ad-420d-ba44-13d35ac2fe95")
 			(effects
 				(font
 					(size 1 1)
@@ -5062,7 +5068,7 @@
 				)
 			)
 		)
-		(property ki_fp_filters "D*SOD?323*")
+		(property ki_fp_filters "D*DO?35*")
 		(path "/18d6d675-9338-43bd-a7b9-b658b487d3b1")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
@@ -5075,7 +5081,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "6ea14d0f-c554-4bc8-899e-2683dc4473c3")
+			(uuid "8917c0aa-42bf-4be9-aada-bcaf46a83f04")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -5085,7 +5091,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "70817b0a-2de8-44ac-a90b-edc3dad32c3c")
+			(uuid "4a970b1f-c153-493f-9aff-1f6135674d99")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -5095,7 +5101,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "a13ca154-df23-489d-b3a3-60893dace4ae")
+			(uuid "3b855876-b453-4f7b-b2d3-b910ceb2797f")
 		)
 		(fp_line
 			(start 1.6 -0.95)
@@ -5105,7 +5111,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "ad461f77-20a2-4443-9e8e-459d4f058d6b")
+			(uuid "8df4c04b-3381-4da5-80d2-227b1f90358f")
 		)
 		(fp_line
 			(start -1.6 0.95)
@@ -5115,7 +5121,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "4be4084b-de37-4fe4-a4d6-821dc8df9325")
+			(uuid "6d516af8-b5d9-451b-9310-c5b7cb0ee73c")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -5125,7 +5131,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "5d01345f-e74a-45ec-b240-aa2d82a70374")
+			(uuid "b6f65869-410c-49f8-afe9-da4b78b56b98")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -5135,7 +5141,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "fa3df727-29fe-439f-9e0f-b465cf565126")
+			(uuid "c7a1d296-bf4e-4375-8e61-739dfa1fe4ec")
 		)
 		(fp_line
 			(start 0.9 0.7)
@@ -5145,7 +5151,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "76e28afb-6470-4e28-aadd-9113e9cd83aa")
+			(uuid "a153a8fb-ae22-4e5c-96dc-ce7f4672aa6f")
 		)
 		(fp_line
 			(start 0.9 -0.7)
@@ -5155,7 +5161,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "60d84c3b-ed30-453d-9ce8-83cdd3f71393")
+			(uuid "a34f72cc-016f-40b0-96fb-0816f1c64ae6")
 		)
 		(fp_line
 			(start 0.2 0.35)
@@ -5165,7 +5171,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "1b1e8e97-4d2e-4cc6-bb66-82de95b9afd5")
+			(uuid "f6c1f7b8-e278-4a8c-9b10-81bf99ac1e18")
 		)
 		(fp_line
 			(start 0.2 0)
@@ -5175,7 +5181,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "fcda4564-ec2b-47bd-872c-43e3e2ff0874")
+			(uuid "437fc3fd-d76a-4bc3-9c43-66c405e5a868")
 		)
 		(fp_line
 			(start 0.2 -0.35)
@@ -5185,7 +5191,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "6d9990da-0b9e-4014-bc6d-d9ec7cb9c97f")
+			(uuid "3cb5b761-c77c-4c4f-b09b-eba80ee8e192")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -5195,7 +5201,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "a22af00b-2b91-439e-9452-fd0edf00f9eb")
+			(uuid "f3ea1f9e-e040-4fdd-8e15-4dd98b52d53b")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -5205,7 +5211,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "c6ffe84a-f796-477f-b758-b9dd9cca258d")
+			(uuid "ef5cf4f5-6c99-4388-bf76-b20bf50cb1ff")
 		)
 		(fp_line
 			(start -0.3 -0.35)
@@ -5215,7 +5221,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "d170295b-4dbd-4e9a-890c-c70b0cdb43b9")
+			(uuid "2384222e-bc2f-4aae-879b-7f04ae4d173e")
 		)
 		(fp_line
 			(start -0.9 0.7)
@@ -5225,7 +5231,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "6ff05466-c5ae-44b1-892c-c0b10f979101")
+			(uuid "5c2b430d-7f7d-46db-a9ef-30fe8acadd3f")
 		)
 		(fp_line
 			(start -0.9 -0.7)
@@ -5235,10 +5241,10 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "8202e82c-a22d-49d1-afe2-00ffcab9da80")
+			(uuid "1dbf445e-3dd4-44eb-a85c-31410485b6ff")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.Fab")
 			(uuid "80df9656-de49-433a-af2e-962ce0f9acd3")
 			(effects
@@ -5894,7 +5900,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "~"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5906,7 +5912,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Push button switch, generic, two pins"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5921,6 +5927,7 @@
 		(path "/bacd2725-38e5-457d-860c-775b5019ce76")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
+		(attr exclude_from_bom)
 		(fp_line
 			(start -9.525 8.255)
 			(end -9.525 -8.255)
@@ -6796,15 +6803,16 @@
 		)
 		(embedded_fonts no)
 	)
-	(footprint "Diode_SMD:D_SOD-323"
+	(footprint "camelpad:D_SOD-323"
 		(layer "F.Cu")
 		(uuid "90384bce-fed8-49fc-9582-c10ee56e30cf")
 		(at 69 95.9825 180)
 		(descr "SOD-323")
 		(tags "SOD-323")
 		(property "Reference" "D5"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "f8fcdb0b-ea37-4ab0-9c52-4cda1bd04be8")
 			(effects
 				(font
@@ -6814,17 +6822,18 @@
 			)
 		)
 		(property "Value" "1N4148"
-			(at 0.1 1.9 0)
-			(layer "F.Fab")
+			(at 0 -1.8175 180)
+			(layer "F.SilkS")
 			(uuid "7d87ea79-e90b-47d8-aeac-12e3837f66b3")
 			(effects
 				(font
 					(size 1 1)
 					(thickness 0.15)
+					(italic yes)
 				)
 			)
 		)
-		(property "Datasheet" "https://www.vishay.com/docs/85751/1n4148ws.pdf"
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -6837,7 +6846,7 @@
 				)
 			)
 		)
-		(property "Description" "75V 0.15A Fast switching Diode, SOD-323"
+		(property "Description" "100V 0.15A standard switching diode, DO-35"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -6855,7 +6864,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c0f4755d-cb2c-4097-a176-f119af234637")
+			(uuid "9f7a9039-47fb-4076-8fbd-ebf17ce41792")
 			(effects
 				(font
 					(size 1 1)
@@ -6868,7 +6877,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c2eb998f-839e-443e-91e9-4dae66cf2837")
+			(uuid "20366a99-4893-4686-b788-78614972719c")
 			(effects
 				(font
 					(size 1 1)
@@ -6876,7 +6885,7 @@
 				)
 			)
 		)
-		(property ki_fp_filters "D*SOD?323*")
+		(property ki_fp_filters "D*DO?35*")
 		(path "/80e1aaf2-c50d-495c-a532-77c66bd02245")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
@@ -6889,7 +6898,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "d5bdf1a7-51f0-42ae-9ff1-96409b7bda93")
+			(uuid "3edf57cf-3595-4fc7-8b5f-dfd318dfd421")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -6899,7 +6908,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "414e217a-9f28-4912-b92e-a0b5f53bf615")
+			(uuid "80c23637-9870-4745-aba8-630b612c68ef")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -6909,7 +6918,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "5f0e0e17-e09d-476d-89f5-a68a7a7dac72")
+			(uuid "47718e43-27a0-4607-8b0d-7dd7da8eaa1f")
 		)
 		(fp_line
 			(start 1.6 -0.95)
@@ -6919,7 +6928,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "93d9322c-e058-4882-a257-7af15bfcf230")
+			(uuid "996dda60-61f0-4e17-a057-ea9ca34741bc")
 		)
 		(fp_line
 			(start -1.6 0.95)
@@ -6929,7 +6938,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "9e6d302e-9d20-4f34-9d9a-fa3a8648a714")
+			(uuid "6f05b8ea-4777-4c91-9bc9-11b2ad09691e")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -6939,7 +6948,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "8c3f321e-24e3-47b8-b700-83b7c3a26cfd")
+			(uuid "4b0e8d3d-00bf-4165-b1d2-08f5fd8860db")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -6949,7 +6958,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "4665671b-0927-4683-88e4-f967868edf1e")
+			(uuid "4ec2286d-17f5-47dc-969f-ca4153209653")
 		)
 		(fp_line
 			(start 0.9 0.7)
@@ -6959,7 +6968,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "4f133d7c-e574-467d-b596-fb8b54ebe8ba")
+			(uuid "8f0960a2-fb69-442f-a868-af56d167ed9d")
 		)
 		(fp_line
 			(start 0.9 -0.7)
@@ -6969,7 +6978,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "80bb5282-fd6a-48b2-bdfb-885c4f0c74a7")
+			(uuid "2173adb4-2154-4b91-9548-89e850469d4a")
 		)
 		(fp_line
 			(start 0.2 0.35)
@@ -6979,7 +6988,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "abc13f20-4d9e-4888-958f-c1fcc2061d3e")
+			(uuid "ebb2eb34-7589-42a0-a49c-81675d0c2224")
 		)
 		(fp_line
 			(start 0.2 0)
@@ -6989,7 +6998,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "367c32c8-54a2-45e2-ad16-7269ff3fd31d")
+			(uuid "d95dd61c-eff2-499b-97b4-cb5f7e7d5f08")
 		)
 		(fp_line
 			(start 0.2 -0.35)
@@ -6999,7 +7008,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "58ac9404-3076-4947-b5e5-44a0a1c76974")
+			(uuid "16612c25-3517-45d0-809f-eb909ac94de5")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -7009,7 +7018,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "4a938330-5ea9-4407-8786-49d51cf643f2")
+			(uuid "4e82cd66-4367-4e87-8ff7-39c86499c3d0")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -7019,7 +7028,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "16c9ec07-64c6-431e-91ec-174d1e29a102")
+			(uuid "02102760-35ab-4015-87a4-0b645916ba89")
 		)
 		(fp_line
 			(start -0.3 -0.35)
@@ -7029,7 +7038,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "135db692-4cb3-4605-acc8-b2e85eef6c16")
+			(uuid "1d4b5b61-96e8-40b8-9e2d-9f184639d931")
 		)
 		(fp_line
 			(start -0.9 0.7)
@@ -7039,7 +7048,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "27b50f0b-dab8-43a2-9183-5e1849f72232")
+			(uuid "e7c4558d-ad99-46eb-8d59-36955b3eec28")
 		)
 		(fp_line
 			(start -0.9 -0.7)
@@ -7049,10 +7058,10 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "0e879b00-f456-404a-b812-c65ccbc92cc9")
+			(uuid "da7fa996-be4c-413f-8764-92af4d357434")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.Fab")
 			(uuid "d649c281-9396-4794-8982-d690a55f4bd4")
 			(effects
@@ -7095,15 +7104,16 @@
 			)
 		)
 	)
-	(footprint "Diode_SMD:D_SOD-323"
+	(footprint "camelpad:D_SOD-323"
 		(layer "F.Cu")
 		(uuid "9120e0ce-e159-4a08-aaa2-50596882ea15")
 		(at 79.27 68.2325 180)
 		(descr "SOD-323")
 		(tags "SOD-323")
 		(property "Reference" "D3"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "bfa4afd0-8af8-40ef-9753-50dbf424041e")
 			(effects
 				(font
@@ -7113,17 +7123,18 @@
 			)
 		)
 		(property "Value" "1N4148"
-			(at 0.1 1.9 0)
+			(at 0 -1.8675 180)
 			(layer "F.SilkS")
 			(uuid "95922e2a-c046-46fd-b226-f18a567bb45f")
 			(effects
 				(font
 					(size 1 1)
 					(thickness 0.15)
+					(italic yes)
 				)
 			)
 		)
-		(property "Datasheet" "https://www.vishay.com/docs/85751/1n4148ws.pdf"
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -7136,7 +7147,7 @@
 				)
 			)
 		)
-		(property "Description" "75V 0.15A Fast switching Diode, SOD-323"
+		(property "Description" "100V 0.15A standard switching diode, DO-35"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -7154,7 +7165,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9674c024-26c3-400b-8364-caed719d1944")
+			(uuid "22c5ced0-9368-4518-a2ac-37236ea835fb")
 			(effects
 				(font
 					(size 1 1)
@@ -7167,7 +7178,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9510cd2c-1c5e-4528-a5e7-676bead6ae20")
+			(uuid "058a1b04-a2ae-4327-bdcd-4ff0fc29e9dd")
 			(effects
 				(font
 					(size 1 1)
@@ -7175,7 +7186,7 @@
 				)
 			)
 		)
-		(property ki_fp_filters "D*SOD?323*")
+		(property ki_fp_filters "D*DO?35*")
 		(path "/57e8f0dd-ad61-4fe4-9298-80491193de36")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
@@ -7188,7 +7199,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "5a1da960-3c7a-410e-a366-89afd6aa7b64")
+			(uuid "6ca0715e-12ca-4825-b744-edd24a3fb518")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -7198,7 +7209,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "436bd8d2-5bc7-4d10-aa54-bc01cdd57a32")
+			(uuid "67cfc3b2-29e2-490c-a87b-c4665db0db7b")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -7208,7 +7219,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "4163f3d6-3946-40fb-81c1-c0268c3f8889")
+			(uuid "eb66d00b-0422-4454-aaed-cbc27148c12b")
 		)
 		(fp_line
 			(start 1.6 -0.95)
@@ -7218,7 +7229,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "32000f14-1d3c-480f-be17-89cdf1dbb9b6")
+			(uuid "1bda3f29-6391-4d6e-b4cd-b7166738a8a8")
 		)
 		(fp_line
 			(start -1.6 0.95)
@@ -7228,7 +7239,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "51ca1fcb-071d-48b3-bf9b-fd5e9a187bd2")
+			(uuid "e18dcf48-e2f7-4d72-b0c4-2fd0131bf54e")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -7238,7 +7249,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "f9051958-f7bc-415a-9805-3008ea44683c")
+			(uuid "765611dc-2d6c-4f96-988b-e7886f235b1a")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -7248,7 +7259,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "832a3c20-6de7-47cb-82b7-da09d4e0e49c")
+			(uuid "fea71339-7bbd-45b8-88f9-ab4447594b6c")
 		)
 		(fp_line
 			(start 0.9 0.7)
@@ -7258,7 +7269,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "2cec846e-8bfe-4e5f-be82-5be76f69c237")
+			(uuid "4c367dd4-b5e3-4816-ae8b-aa794aa29408")
 		)
 		(fp_line
 			(start 0.9 -0.7)
@@ -7268,7 +7279,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "1c1c3132-da6b-488c-9cf3-02059d78d25e")
+			(uuid "ee15f863-f985-4b34-b035-a885d9df81b3")
 		)
 		(fp_line
 			(start 0.2 0.35)
@@ -7278,7 +7289,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "0a76c605-472a-495a-a1a3-8633882a1c33")
+			(uuid "766d34fa-baad-416b-a503-f6388688cca4")
 		)
 		(fp_line
 			(start 0.2 0)
@@ -7288,7 +7299,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "18bebc8d-11bc-45d8-8ea1-cc12ac5843db")
+			(uuid "64117482-20ad-45b0-a694-8d880f33ade8")
 		)
 		(fp_line
 			(start 0.2 -0.35)
@@ -7298,7 +7309,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "8a053eac-c6b5-4085-86a0-5416db57f275")
+			(uuid "656c5058-03e5-4056-af5c-27e3e0f36342")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -7308,7 +7319,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "62ca1afe-197d-4076-b706-0aec3a8baf0c")
+			(uuid "779ada09-a466-4d14-83ae-874332794132")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -7318,7 +7329,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "6fd6ee9e-ef1e-4ff4-82f2-0feb43ae3b21")
+			(uuid "29ce8a29-685f-41f2-92ba-05a121e4b1fe")
 		)
 		(fp_line
 			(start -0.3 -0.35)
@@ -7328,7 +7339,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "30cada47-a4f5-43c2-9884-1972136fe27f")
+			(uuid "2e99b69b-ea10-4a80-9785-be4aa7e159f0")
 		)
 		(fp_line
 			(start -0.9 0.7)
@@ -7338,7 +7349,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "b37744c1-353a-46d1-967a-f2e6b46afa7b")
+			(uuid "955497f8-674d-40aa-b4a7-4e5754990d07")
 		)
 		(fp_line
 			(start -0.9 -0.7)
@@ -7348,10 +7359,10 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "5392406e-6304-4b46-b266-b7d4dc3e6d69")
+			(uuid "30832d3a-dcd1-4ae4-99c7-85be83f7d641")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.Fab")
 			(uuid "a588d7a0-4ab9-4563-8b81-4c3239071aa5")
 			(effects
@@ -7394,15 +7405,16 @@
 			)
 		)
 	)
-	(footprint "Diode_SMD:D_SOD-323"
+	(footprint "camelpad:D_SOD-323"
 		(layer "F.Cu")
 		(uuid "9bbe7a8e-2cb6-4a37-9c56-5d45958c8974")
 		(at 58.25 68.2325 180)
 		(descr "SOD-323")
 		(tags "SOD-323")
 		(property "Reference" "D4"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "17b74b61-ff9b-4fc8-a27c-94f712bfa6a8")
 			(effects
 				(font
@@ -7412,17 +7424,18 @@
 			)
 		)
 		(property "Value" "1N4148"
-			(at 0.1 1.9 0)
-			(layer "F.Fab")
+			(at 0.05 -1.9675 180)
+			(layer "F.SilkS")
 			(uuid "c4eb8562-58df-4e4b-a8f0-235bc2c2b893")
 			(effects
 				(font
 					(size 1 1)
 					(thickness 0.15)
+					(italic yes)
 				)
 			)
 		)
-		(property "Datasheet" "https://www.vishay.com/docs/85751/1n4148ws.pdf"
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -7435,7 +7448,7 @@
 				)
 			)
 		)
-		(property "Description" "75V 0.15A Fast switching Diode, SOD-323"
+		(property "Description" "100V 0.15A standard switching diode, DO-35"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -7453,7 +7466,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "6e616915-f412-41c0-9e76-b695a86ac50c")
+			(uuid "b64f6616-be8b-4f1a-8cc3-da16aeacc24d")
 			(effects
 				(font
 					(size 1 1)
@@ -7466,7 +7479,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c535145d-650f-482c-9173-85b814cbb22d")
+			(uuid "249b5cb6-b512-4bd6-9ed3-1ffb97e487ad")
 			(effects
 				(font
 					(size 1 1)
@@ -7474,7 +7487,7 @@
 				)
 			)
 		)
-		(property ki_fp_filters "D*SOD?323*")
+		(property ki_fp_filters "D*DO?35*")
 		(path "/b9032675-48ec-4c3c-bd45-2b59d047bb9f")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
@@ -7487,7 +7500,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "e1e1e23a-1509-438c-a675-3617ffc93d84")
+			(uuid "d6108cb6-ab41-4cd0-be95-9609152b2698")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -7497,7 +7510,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "c887855c-a106-4f89-9b68-a0995da86748")
+			(uuid "dd55523e-0256-4753-aa1e-081953524d3d")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -7507,7 +7520,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "2a828fe9-4cb1-45cb-84d8-fdd969c31879")
+			(uuid "59c8fea6-552f-4f99-a37e-7b642ed8e452")
 		)
 		(fp_line
 			(start 1.6 -0.95)
@@ -7517,7 +7530,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "304a4f1f-0249-42a9-bd37-4b7ad010fc31")
+			(uuid "b44b69bc-b157-4662-9529-a22bfa840461")
 		)
 		(fp_line
 			(start -1.6 0.95)
@@ -7527,7 +7540,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "451c49de-f051-4294-8e91-f65c9828d71d")
+			(uuid "f461a186-94a2-4cad-ab2f-3744a026d470")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -7537,7 +7550,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "95d7d6ca-f3da-482d-af26-881954f54cb5")
+			(uuid "d9e4e63b-dacc-4e8d-90e5-f0687b27891d")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -7547,7 +7560,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "a4062bef-9b2c-45ea-a210-c6672207d638")
+			(uuid "706be1ff-eb66-45e6-8a99-cb412cc60f57")
 		)
 		(fp_line
 			(start 0.9 0.7)
@@ -7557,7 +7570,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "4bfeb769-200b-42e8-9dd6-22b55da43760")
+			(uuid "e9e6bf4b-cf41-47bc-9ee1-cd12f00b9fe9")
 		)
 		(fp_line
 			(start 0.9 -0.7)
@@ -7567,7 +7580,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "6c16f212-bac2-4663-af53-cb0000d8c67e")
+			(uuid "849dcb23-8aa7-4f25-9b60-67978dd0c231")
 		)
 		(fp_line
 			(start 0.2 0.35)
@@ -7577,7 +7590,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "68fa24a5-808e-460c-9766-60ef6b72e386")
+			(uuid "87c2aea8-0333-478b-a392-77eff66578e7")
 		)
 		(fp_line
 			(start 0.2 0)
@@ -7587,7 +7600,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "0fdb1185-f3c6-4ba9-bcf4-a2b9852170b9")
+			(uuid "4a63cbca-db32-4623-a94c-5b0bc96468e9")
 		)
 		(fp_line
 			(start 0.2 -0.35)
@@ -7597,7 +7610,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "aba2c956-cf96-4cbd-84da-de241e22528e")
+			(uuid "1baccff7-ea74-4916-a7c6-11c6f41b0d14")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -7607,7 +7620,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "225657b9-997c-4ffc-be93-ef98ff4b882f")
+			(uuid "ac145b04-f96e-4753-952a-9e910417b269")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -7617,7 +7630,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "a878ff79-7c68-4e83-9e3c-a0ac81736504")
+			(uuid "80890249-b3c4-42c5-b8de-f606ad0beee1")
 		)
 		(fp_line
 			(start -0.3 -0.35)
@@ -7627,7 +7640,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "281bf5c5-855c-4815-96ee-e57647fae6a4")
+			(uuid "bb77f86e-fb7b-430a-8ec6-ba840f9b9641")
 		)
 		(fp_line
 			(start -0.9 0.7)
@@ -7637,7 +7650,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "066e5e36-4c5d-456c-a3f7-8334755f3353")
+			(uuid "36eb2e79-0056-444d-b875-27d1a01955d4")
 		)
 		(fp_line
 			(start -0.9 -0.7)
@@ -7647,10 +7660,10 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "008d6ffc-f73d-4186-83d9-e8868eccdcb8")
+			(uuid "6ff914aa-526e-4911-98a5-f2b46c3bd4cf")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.Fab")
 			(uuid "194f884a-ade6-4b9e-b5fa-a7bc9b68a716")
 			(effects
@@ -8386,7 +8399,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "~"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8398,7 +8411,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Push button switch, generic, two pins"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8413,6 +8426,7 @@
 		(path "/e26fc281-2c86-4551-b7c0-14357543b40e")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
+		(attr exclude_from_bom)
 		(fp_line
 			(start -9.525 8.255)
 			(end -9.525 -8.255)
@@ -9461,7 +9475,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "~"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -9473,7 +9487,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Push button switch, generic, two pins"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -9488,6 +9502,7 @@
 		(path "/fc4f5e00-9493-4a57-b8a0-b4141d5f3fd3")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
+		(attr exclude_from_bom)
 		(fp_line
 			(start -9.525 8.255)
 			(end -9.525 -8.255)
@@ -10363,17 +10378,17 @@
 		)
 		(embedded_fonts no)
 	)
-	(footprint "Diode_SMD:D_SOD-323"
+	(footprint "camelpad:D_SOD-323"
 		(layer "F.Cu")
 		(uuid "bbe3f437-80e4-4f70-81cb-3510ae1a5699")
 		(at 121.25 68.2325 180)
 		(descr "SOD-323")
 		(tags "SOD-323")
 		(property "Reference" "D1"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "94b7e0f1-c548-4292-855a-b8f7158d783c")
+			(uuid "e90c73a1-76c8-4c6a-a2c9-35816344b542")
 			(effects
 				(font
 					(size 1 1)
@@ -10382,22 +10397,23 @@
 			)
 		)
 		(property "Value" "1N4148"
-			(at 0.1 1.9 0)
+			(at 0 -1.9675 180)
 			(layer "F.SilkS")
-			(uuid "5cf951da-c0ee-4551-9759-d9e4ae6657cf")
+			(uuid "4e0b8b39-9747-40b9-8772-7f4bbda0d1da")
 			(effects
 				(font
 					(size 1 1)
 					(thickness 0.15)
+					(italic yes)
 				)
 			)
 		)
-		(property "Datasheet" "https://www.vishay.com/docs/85751/1n4148ws.pdf"
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "40199f3f-75e0-431e-abd7-3fed0897f8d4")
+			(uuid "3d8db93d-2533-4302-9b49-8745e3e2b213")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10405,12 +10421,12 @@
 				)
 			)
 		)
-		(property "Description" "75V 0.15A Fast switching Diode, SOD-323"
+		(property "Description" "100V 0.15A standard switching diode, DO-35"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "aad1ec47-6afc-44f9-887d-b76bee412c1f")
+			(uuid "9bf49b02-1725-43f1-b23a-c92faaa9b3f3")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10423,7 +10439,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9ca00d3d-cb4f-43f8-8fcf-c1d1fd5512d8")
+			(uuid "8095d1e9-f950-4ded-9b48-2a6832bc8d4e")
 			(effects
 				(font
 					(size 1 1)
@@ -10436,7 +10452,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e35ccbd1-48dc-4559-a60a-c6ee200133c1")
+			(uuid "d68077db-05a4-41ea-b0be-51f530e79287")
 			(effects
 				(font
 					(size 1 1)
@@ -10444,7 +10460,7 @@
 				)
 			)
 		)
-		(property ki_fp_filters "D*SOD?323*")
+		(property ki_fp_filters "D*DO?35*")
 		(path "/582b3939-c009-4f8f-af18-85a612fa0a39")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
@@ -10457,7 +10473,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "16f3823d-90dc-45cd-9e1e-772916ed1bc1")
+			(uuid "75c42c48-9449-449e-9cc4-e62a6028570d")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -10467,7 +10483,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "84232507-002d-4147-9605-c43419dedead")
+			(uuid "09376769-c094-452e-932d-9607f81d957f")
 		)
 		(fp_line
 			(start -1.61 -0.85)
@@ -10477,7 +10493,7 @@
 				(type solid)
 			)
 			(layer "F.SilkS")
-			(uuid "90205213-eb7a-4c11-955e-b7ab844d9b71")
+			(uuid "a132bdfb-fa23-4c5b-8926-143240aa5320")
 		)
 		(fp_line
 			(start 1.6 -0.95)
@@ -10487,7 +10503,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "5ddaf0af-ab44-4839-b4f0-4ab62891e6f9")
+			(uuid "f3df1a76-4f5e-40db-b837-6f0066962cd8")
 		)
 		(fp_line
 			(start -1.6 0.95)
@@ -10497,7 +10513,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "28adabf4-3371-43a6-8c82-9ac680af3937")
+			(uuid "38e5ed1b-cbd8-475a-8a06-e8b198287962")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -10507,7 +10523,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "83ec0731-8abd-4b36-b4f9-74eeb6b5d58c")
+			(uuid "97f97f36-4587-4a3e-9da5-323bcb63073f")
 		)
 		(fp_line
 			(start -1.6 -0.95)
@@ -10517,7 +10533,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "829d5cf6-b13b-4a82-a4f7-a6c461138c50")
+			(uuid "054e0645-471b-4715-af22-1ef550a0e285")
 		)
 		(fp_line
 			(start 0.9 0.7)
@@ -10527,7 +10543,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "2b722ec2-6196-4702-8992-fd0f37bf7038")
+			(uuid "4ee88f9c-2e3e-4081-9cbf-9e800da78c17")
 		)
 		(fp_line
 			(start 0.9 -0.7)
@@ -10537,7 +10553,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "4ca46a0e-3301-4e23-9b42-8ff89cf997f3")
+			(uuid "67a81025-5afa-4239-813b-8dfefd5b600a")
 		)
 		(fp_line
 			(start 0.2 0.35)
@@ -10547,7 +10563,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "759dc627-3a72-4597-9503-01fc37cd61ef")
+			(uuid "4e3c9707-f739-4443-9c59-633c80379745")
 		)
 		(fp_line
 			(start 0.2 0)
@@ -10557,7 +10573,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "34930630-29fb-4bd8-ac0d-b53ccf8bc8ef")
+			(uuid "865184a2-095c-4a83-ae3f-05c321c31477")
 		)
 		(fp_line
 			(start 0.2 -0.35)
@@ -10567,7 +10583,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "41bb68c6-75e4-4c2f-b805-b85f440e4fae")
+			(uuid "2888fcc3-61bb-4e2f-8ce2-be89f564da70")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -10577,7 +10593,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "db8e88dd-c356-4fb9-8874-2eb275a0c36e")
+			(uuid "c564c040-2fcd-481f-8653-9dff8ec96965")
 		)
 		(fp_line
 			(start -0.3 0)
@@ -10587,7 +10603,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "236dbb25-6087-4b3d-bde7-85a9ef69cf71")
+			(uuid "71eed6cd-9c02-465e-9fb0-6230d2f15401")
 		)
 		(fp_line
 			(start -0.3 -0.35)
@@ -10597,7 +10613,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "76fc7161-6941-4cf3-9716-b900992cd2a1")
+			(uuid "12616be7-e4d9-4838-87ad-f6a3344ba723")
 		)
 		(fp_line
 			(start -0.9 0.7)
@@ -10607,7 +10623,7 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "9c610830-03fd-4625-a545-794ee743ef99")
+			(uuid "e507a1da-a6e6-4670-ba06-a30dac35c0b7")
 		)
 		(fp_line
 			(start -0.9 -0.7)
@@ -10617,10 +10633,10 @@
 				(type solid)
 			)
 			(layer "F.Fab")
-			(uuid "232debfd-3ea6-4ac5-bdcd-5f1ee47f4212")
+			(uuid "f541db62-7447-4dae-8c73-4212eae03337")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -1.85 0)
+			(at 0 -1.85 180)
 			(layer "F.Fab")
 			(uuid "7929db68-0aaa-4da6-85c2-6bbca2c3c02d")
 			(effects
@@ -10693,7 +10709,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "~"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10705,7 +10721,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Push button switch, generic, two pins"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10720,6 +10736,7 @@
 		(path "/75544d7e-a3ca-4c3c-8a2a-b69a467fffa3")
 		(sheetname "/")
 		(sheetfile "camelpad.kicad_sch")
+		(attr exclude_from_bom)
 		(fp_line
 			(start -9.525 8.255)
 			(end -9.525 -8.255)
