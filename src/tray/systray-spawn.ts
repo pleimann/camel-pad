@@ -32,6 +32,7 @@ export interface ClickAction {
 
 export interface SysTrayHandle {
   updateItem(id: number, updates: Partial<MenuItem>): void;
+  updateConfig(config: Record<string, unknown>): void;
   showPopover(url: string, width?: number, height?: number): void;
   hidePopover(): void;
   kill(): void;
@@ -143,6 +144,9 @@ export function spawnSysTray(
               item: { ...trimItem(existing, id), ...updates, __id: id },
               seq_id: -1,
             }) + '\n');
+          },
+          updateConfig(config: Record<string, unknown>) {
+            proc.stdin.write(JSON.stringify(config) + '\n');
           },
           showPopover(url: string, width = 520, height = 720) {
             proc.stdin.write(JSON.stringify({ type: 'show-popover', url, width, height }) + '\n');

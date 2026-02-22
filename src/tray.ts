@@ -34,6 +34,7 @@ async function tryStartBridge() {
       tray?.updateItem(ITEM_STATUS, {
         title: status.connected ? '● Connected' : '○ Disconnected',
       });
+      tray?.updateConfig({ alpha: status.connected ? 1.0 : 0.4 });
     });
     return handle;
   } catch (err: any) {

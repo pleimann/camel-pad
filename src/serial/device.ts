@@ -72,8 +72,12 @@ export class SerialDevice extends EventEmitter {
       console.log(`Connected to serial port ${portPath}`);
       this.emit('connected');
       return true;
-    } catch (err) {
-      console.error('Failed to open serial port:', err);
+    } catch (err: any) {
+      if (err.code === 'ENOENT' || err.code === 'ENXIO') {
+        console.log(`Device not available (${portPath}), retrying...`);
+      } else {
+        console.error('Failed to open serial port:', err.message);
+      }
       this.scheduleReconnect();
       return false;
     }
@@ -87,8 +91,10 @@ export class SerialDevice extends EventEmitter {
         execSync(`stty -F "${portPath}" ${SERIAL_BAUD} raw clocal -echo cs8 -cstopb -parenb`, { timeout: 5000 });
       }
     } catch (err: any) {
-      // stty can hang on some USB CDC ports; log but don't fail
-      console.warn(`stty configuration warning: ${err.message}`);
+      // stty can hang on some USB CDC ports; ignore ENOENT (port not present yet), log others
+      if (err.code !== 'ENOENT' && !err.message?.includes('No such file')) {
+        console.warn(`stty configuration warning: ${err.message}`);
+      }
     }
   }
 
@@ -155,7 +161,6 @@ export class SerialDevice extends EventEmitter {
 
   private handleError(err: Error): void {
     console.error('Serial error:', err.message);
-    this.emit('error', err);
     this.disconnect();
     this.scheduleReconnect();
   }

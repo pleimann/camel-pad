@@ -146,6 +146,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let tooltip = config["tooltip"] as? String {
             statusItem.button?.toolTip = tooltip
         }
+        if let alpha = config["alpha"] as? CGFloat {
+            statusItem.button?.alphaValue = alpha
+        }
     }
 
     // update-item: reflect connection status in the tooltip
