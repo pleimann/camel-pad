@@ -85,6 +85,10 @@ async function main() {
     {
       onTrayClick,
       onQuitClick,
+      onPopoverClosed() {
+        settingsHandle?.stop();
+        settingsHandle = null;
+      },
     },
   );
 

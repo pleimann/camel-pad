@@ -68,6 +68,7 @@ export interface SysTrayHandlers {
   onClick?: (action: ClickAction) => void;
   onTrayClick?: () => void;
   onQuitClick?: () => void;
+  onPopoverClosed?: () => void;
 }
 
 export function spawnSysTray(
@@ -164,6 +165,8 @@ export function spawnSysTray(
         handlers.onTrayClick?.();
       } else if (action.type === 'quit-clicked') {
         handlers.onQuitClick?.();
+      } else if (action.type === 'popover-closed') {
+        handlers.onPopoverClosed?.();
       }
     });
 
