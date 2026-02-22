@@ -1,4 +1,3 @@
-import { execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
 import { stringify } from 'yaml';
 import { loadConfig } from '../config/loader.js';
@@ -9,15 +8,16 @@ import type { Config } from '../types.js';
 import settingsHtmlPath from '../../assets/settings.html' with { type: 'file' };
 
 export interface SettingsServerHandle {
+  port: number;
   stop(): void;
 }
 
 /**
- * Opens a local settings web page in the user's default browser.
- * Starts a temporary HTTP server on a random port, then opens it.
+ * Starts a temporary HTTP server for the settings UI on a random port.
+ * Returns the port so the caller can open it in a popover or browser.
  * The server shuts down automatically when the user saves or after a timeout.
  */
-export async function openSettings(
+export async function startSettingsServer(
   configPath: string,
   onSaved?: () => void,
 ): Promise<SettingsServerHandle> {
@@ -95,28 +95,14 @@ export async function openSettings(
 
   const url = `http://localhost:${server.port}`;
   console.log('Settings server:', url);
-  openBrowser(url);
 
   return {
+    port: server.port,
     stop() {
       if (idleTimer) clearTimeout(idleTimer);
       server?.stop();
     },
   };
-}
-
-function openBrowser(url: string): void {
-  try {
-    if (process.platform === 'darwin') {
-      execSync(`open "${url}"`);
-    } else if (process.platform === 'win32') {
-      execSync(`start "" "${url}"`);
-    } else {
-      execSync(`xdg-open "${url}"`);
-    }
-  } catch (err) {
-    console.warn('Could not open browser automatically. Open this URL manually:', url);
-  }
 }
 
 /**

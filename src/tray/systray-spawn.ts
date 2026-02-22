@@ -6,8 +6,8 @@ import { homedir } from 'os';
 
 // Asset-embed the Go tray binaries. At compile time (bun build --compile),
 // these become embedded $bunfs/ paths. At dev time, they resolve to real files.
-import trayBinDarwin from '../../assets/traybin/tray_darwin_release' with { type: 'file' };
-import trayBinWindows from '../../assets/traybin/tray_windows_release.exe' with { type: 'file' };
+import trayBinDarwin from '@assets/traybin/tray_darwin_release' with { type: 'file' };
+import trayBinWindows from '@assets/traybin/tray_windows_release.exe' with { type: 'file' };
 
 export interface MenuItem {
   title: string;
@@ -32,6 +32,8 @@ export interface ClickAction {
 
 export interface SysTrayHandle {
   updateItem(id: number, updates: Partial<MenuItem>): void;
+  showPopover(url: string, width?: number, height?: number): void;
+  hidePopover(): void;
   kill(): void;
   onExit(cb: () => void): void;
 }
@@ -62,9 +64,15 @@ function getTrayBinPath(): string {
   return destPath;
 }
 
+export interface SysTrayHandlers {
+  onClick?: (action: ClickAction) => void;
+  onTrayClick?: () => void;
+  onQuitClick?: () => void;
+}
+
 export function spawnSysTray(
   menu: SysTrayMenu,
-  onClick: (action: ClickAction) => void,
+  handlers: SysTrayHandlers,
 ): Promise<SysTrayHandle> {
   return new Promise((resolve, reject) => {
     let binPath: string;
@@ -135,6 +143,12 @@ export function spawnSysTray(
               seq_id: -1,
             }) + '\n');
           },
+          showPopover(url: string, width = 520, height = 720) {
+            proc.stdin.write(JSON.stringify({ type: 'show-popover', url, width, height }) + '\n');
+          },
+          hidePopover() {
+            proc.stdin.write(JSON.stringify({ type: 'hide-popover' }) + '\n');
+          },
           kill() {
             proc.stdin.write(JSON.stringify({ type: 'exit' }) + '\n');
           },
@@ -145,7 +159,11 @@ export function spawnSysTray(
 
         resolve(handle);
       } else if (action.type === 'clicked') {
-        onClick(action as ClickAction);
+        handlers.onClick?.(action as ClickAction);
+      } else if (action.type === 'tray-clicked') {
+        handlers.onTrayClick?.();
+      } else if (action.type === 'quit-clicked') {
+        handlers.onQuitClick?.();
       }
     });
 

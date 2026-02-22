@@ -2,26 +2,24 @@
 // camel-pad menu bar app entry point
 
 import { readFileSync } from 'fs';
-import { loadConfig, validateConfig } from './config/loader.js';
-import { startBridge } from './bridge.js';
-import { getTrayConfigPath } from './tray/config-store.js';
-import { spawnSysTray, type ClickAction, type SysTrayHandle } from './tray/systray-spawn.js';
-import { openSettings } from './tray/settings-server.js';
-import type { BridgeHandle } from './bridge.js';
+import { loadConfig, validateConfig } from '@/config/loader.js';
+import { startBridge } from '@/bridge.js';
+import { getTrayConfigPath } from '@/tray/config-store.js';
+import { spawnSysTray, type SysTrayHandle } from '@/tray/systray-spawn.js';
+import { startSettingsServer } from '@/tray/settings-server.js';
+import type { BridgeHandle } from '@/bridge.js';
 
 // Embed icon as a Bun asset
-import iconPath from '../assets/icon.png' with { type: 'file' };
+import iconPath from '@assets/icon.png' with { type: 'file' };
 
 const configPath = getTrayConfigPath();
 
-// Item IDs assigned in order by spawnSysTray (1-indexed, separators included)
-const ITEM_STATUS = 1;   // Status line (disabled)
-const ITEM_SETTINGS = 3; // "Settings..."
-const ITEM_QUIT = 5;     // "Quit"
+// Item ID for the connection status line (used with updateItem for tooltip updates)
+const ITEM_STATUS = 1;
 
 let bridge: BridgeHandle | null = null;
 let tray: SysTrayHandle | null = null;
-let settingsHandle: { stop(): void } | null = null;
+let settingsHandle: { port: number; stop(): void } | null = null;
 
 async function tryStartBridge() {
   const config = loadConfig(configPath);
@@ -44,15 +42,17 @@ async function tryStartBridge() {
   }
 }
 
-async function onSettingsClick() {
-  if (settingsHandle) return; // already open
-  settingsHandle = await openSettings(configPath, async () => {
-    // Config saved — restart bridge with new config
+async function onTrayClick() {
+  if (settingsHandle) return; // popover already open
+  settingsHandle = await startSettingsServer(configPath, async () => {
+    // Config saved — restart bridge with new config, then close popover
     bridge?.shutdown();
     bridge = null;
     bridge = await tryStartBridge();
+    tray?.hidePopover();
     settingsHandle = null;
   });
+  tray?.showPopover(`http://localhost:${settingsHandle.port}`);
 }
 
 function onQuitClick() {
@@ -80,19 +80,11 @@ async function main() {
       tooltip: 'camel-pad',
       items: [
         { title: initialStatus, enabled: false },
-        '<SEPARATOR>',
-        { title: 'Settings...', enabled: true },
-        '<SEPARATOR>',
-        { title: 'Quit', enabled: true },
       ],
     },
-    (action: ClickAction) => {
-      const id = action.item?.__id ?? (action as any).__id;
-      if (id === ITEM_SETTINGS) {
-        onSettingsClick();
-      } else if (id === ITEM_QUIT) {
-        onQuitClick();
-      }
+    {
+      onTrayClick,
+      onQuitClick,
     },
   );
 
@@ -100,7 +92,7 @@ async function main() {
 
   // If no valid config on first run, open settings automatically
   if (!bridge) {
-    setTimeout(() => onSettingsClick(), 500);
+    setTimeout(() => onTrayClick(), 500);
   }
 
   console.log('camel-pad tray running. Config:', configPath);
