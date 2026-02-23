@@ -3,7 +3,7 @@ import { GestureDetector } from './gesture/detector.js';
 import { ConfigWatcher } from './config/watcher.js';
 import { NotificationServer } from './websocket/server.js';
 import { validateConfig } from './config/loader.js';
-import type { NotificationMessage } from './types.js';
+import type { NotificationMessage, LogEntry } from './types.js';
 
 export interface BridgeStatus {
   connected: boolean;
@@ -15,6 +15,7 @@ export interface BridgeHandle {
   shutdown(): void;
   getStatus(): BridgeStatus;
   onStatusChange(cb: (status: BridgeStatus) => void): void;
+  getLogs(since?: number): { entries: LogEntry[]; cursor: number };
   sendText(text: string): boolean;
   sendStatus(text: string): boolean;
   clearDisplay(): boolean;
@@ -54,6 +55,15 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
   let pingInterval: ReturnType<typeof setInterval> | null = null;
   let handedness = config.handedness;
 
+  const LOG_MAX = 500;
+  const logBuffer: LogEntry[] = [];
+  let logSeq = 0;
+
+  function pushLog(dir: LogEntry['dir'], type: string, summary: string) {
+    logBuffer.push({ seq: ++logSeq, ts: Date.now(), dir, type, summary });
+    if (logBuffer.length > LOG_MAX) logBuffer.shift();
+  }
+
   function emitStatus() {
     const status: BridgeStatus = {
       connected,
@@ -65,6 +75,7 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
 
   // Serial button events → Gesture detector (with handedness remapping)
   serialDevice.on('button', ({ buttonId, pressed }) => {
+    pushLog('in', 'button', `${buttonId} ${pressed ? 'pressed' : 'released'}`);
     const num = parseInt(buttonId.replace('key', ''));
     const remapped = `key${remapButtonIndex(num, handedness)}`;
     gestureDetector.handleButton(remapped, pressed);
@@ -73,6 +84,7 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
   serialDevice.on('connected', () => {
     connected = true;
     portPath = config.device.port ?? null;
+    pushLog('sys', 'connected', `Connected${portPath ? ` — ${portPath}` : ''}`);
     emitStatus();
     serialDevice.sendStatus('Connected');
     pingInterval = setInterval(() => serialDevice.sendPing(), 5000);
@@ -81,12 +93,14 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
   serialDevice.on('disconnected', () => {
     connected = false;
     portPath = null;
+    pushLog('sys', 'disconnected', 'Disconnected');
     if (pingInterval) { clearInterval(pingInterval); pingInterval = null; }
     emitStatus();
   });
 
   // Gesture events → Notification server
   gestureDetector.on('gesture', ({ buttonId, gesture }) => {
+    pushLog('in', 'gesture', `${buttonId} ${gesture}`);
     console.log(`Gesture: ${buttonId} ${gesture}`);
     const handled = notificationServer.handleGesture(buttonId, gesture);
     if (!handled && !notificationServer.hasPending()) {
@@ -96,12 +110,15 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
 
   // Notification events → Serial display
   notificationServer.on('notification', (message: NotificationMessage) => {
+    pushLog('in', 'notification', message.text.length > 60 ? message.text.slice(0, 60) + '…' : message.text);
+    pushLog('out', 'display', message.text.length > 60 ? message.text.slice(0, 60) + '…' : message.text);
     console.log(`Notification: ${message.text}`);
     serialDevice.sendText(message.text);
   });
 
   // Config reload events
   configWatcher.on('reload', (newConfig) => {
+    pushLog('sys', 'config', 'Configuration reloaded');
     console.log('Applying new configuration...');
     handedness = newConfig.handedness;
     gestureDetector.updateConfig({
@@ -130,21 +147,32 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
     onStatusChange(cb: (status: BridgeStatus) => void) {
       statusListeners.push(cb);
     },
+    getLogs(since?: number): { entries: LogEntry[]; cursor: number } {
+      const entries = since !== undefined
+        ? logBuffer.filter(e => e.seq > since)
+        : logBuffer.slice();
+      return { entries, cursor: logSeq };
+    },
     sendText(text: string): boolean {
+      pushLog('out', 'display-text', text.length > 60 ? text.slice(0, 60) + '…' : text);
       return serialDevice.sendText(text);
     },
     sendStatus(text: string): boolean {
+      pushLog('out', 'status-text', text.length > 60 ? text.slice(0, 60) + '…' : text);
       return serialDevice.sendStatus(text);
     },
     clearDisplay(): boolean {
+      pushLog('out', 'clear', 'Display cleared');
       return serialDevice.clearDisplay();
     },
     sendLeds(leds: Array<{ index: number; r: number; g: number; b: number }>): boolean {
       const remapped = leds.map(led => ({ ...led, index: remapButtonIndex(led.index, handedness) }));
+      pushLog('out', 'leds', leds.map(l => `[${l.index}] #${[l.r, l.g, l.b].map(v => v.toString(16).padStart(2, '0')).join('')}`).join(' '));
       return serialDevice.sendLeds(remapped);
     },
     sendLabels(labels: string[]): boolean {
       const reordered = handedness === 'right' ? [...labels].reverse() : labels;
+      pushLog('out', 'labels', labels.join(' | '));
       return serialDevice.sendLabels(reordered);
     },
   };

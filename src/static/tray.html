@@ -457,17 +457,126 @@
         background: #fde8e8;
         color: #8b1a1a;
       }
+
+      /* ── Monitor view ── */
+      .mon-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .mon-toolbar input[type="text"] {
+        flex: 1;
+        height: 28px;
+        border: 1px solid #d2d2d7;
+        border-radius: 6px;
+        padding: 0 8px;
+        font-size: 13px;
+        font-family: inherit;
+        background: #fff;
+        color: #1d1d1f;
+        outline: none;
+      }
+
+      .mon-toolbar input[type="text"]:focus {
+        border-color: #0071e3;
+        box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+      }
+
+      .mon-toolbar label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        color: #6e6e73;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .mon-log {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        height: 340px;
+        overflow-y: auto;
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 11.5px;
+      }
+
+      .mon-log:empty::after {
+        content: "No events yet…";
+        display: block;
+        padding: 16px;
+        color: #c7c7cc;
+        text-align: center;
+      }
+
+      .log-row {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 5px 12px;
+        border-bottom: 1px solid #f5f5f7;
+        line-height: 1.4;
+      }
+
+      .log-row:last-child {
+        border-bottom: none;
+      }
+
+      .log-row.filtered {
+        display: none;
+      }
+
+      .log-ts {
+        color: #aeaeb2;
+        flex-shrink: 0;
+        font-size: 11px;
+      }
+
+      .log-dir {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 1px 5px;
+        border-radius: 4px;
+        width: 32px;
+        text-align: center;
+      }
+
+      .log-dir-in  { background: #d4f4dd; color: #1a5c2a; }
+      .log-dir-out { background: #dde9ff; color: #1a3a8a; }
+      .log-dir-sys { background: #f0f0f2; color: #6e6e73; }
+
+      .log-type {
+        color: #6e6e73;
+        flex-shrink: 0;
+        min-width: 90px;
+      }
+
+      .log-summary {
+        color: #1d1d1f;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
     </style>
   </head>
   <body>
     <!-- Tab bar -->
     <div class="tab-bar">
       <div class="tab-seg">
-        <button class="tab-btn active" onclick="switchTab('control')">
+        <button class="tab-btn active" data-tab="control" onclick="switchTab('control')">
           Control
         </button>
-        <button class="tab-btn" onclick="switchTab('settings')">
+        <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">
           Settings
+        </button>
+        <button class="tab-btn" data-tab="monitor" onclick="switchTab('monitor')">
+          Monitor
         </button>
       </div>
     </div>
@@ -781,6 +890,19 @@
     </div>
     <!-- /view-settings -->
 
+    <!-- ═══════════════════════════════════════════════════════════════
+         MONITOR VIEW
+         ═══════════════════════════════════════════════════════════════ -->
+    <div id="view-monitor" class="view">
+      <div class="mon-toolbar">
+        <input type="text" id="mon-filter" placeholder="Filter…" oninput="applyMonitorFilter()" />
+        <label><input type="checkbox" id="mon-pause" /> Pause</label>
+        <button type="button" class="btn btn-secondary btn-small" onclick="clearMonitorLog()">Clear</button>
+      </div>
+      <div class="mon-log" id="mon-log"></div>
+    </div>
+    <!-- /view-monitor -->
+
     <script>
       let currentConfig = null;
       let statusPollInterval = null;
@@ -788,16 +910,98 @@
       // ── Tab switching ────────────────────────────────────────────────
 
       function switchTab(tab) {
-        document.querySelectorAll(".tab-btn").forEach((b, i) => {
-          b.classList.toggle("active", (i === 0) === (tab === "control"));
+        document.querySelectorAll(".tab-btn").forEach((b) => {
+          b.classList.toggle("active", b.dataset.tab === tab);
         });
-        document
-          .getElementById("view-settings")
-          .classList.toggle("active", tab === "settings");
-        document
-          .getElementById("view-control")
-          .classList.toggle("active", tab === "control");
+        document.getElementById("view-control").classList.toggle("active", tab === "control");
+        document.getElementById("view-settings").classList.toggle("active", tab === "settings");
+        document.getElementById("view-monitor").classList.toggle("active", tab === "monitor");
+        if (tab === "monitor") startMonitorPolling();
+        else stopMonitorPolling();
+      }
 
+      // ── Monitor view ─────────────────────────────────────────────────
+
+      let monitorPollInterval = null;
+      let monitorCursor = 0;
+
+      function fmtTime(ts) {
+        const d = new Date(ts);
+        return d.toLocaleTimeString("en-US", { hour12: false }) + "." +
+          String(d.getMilliseconds()).padStart(3, "0");
+      }
+
+      function appendLogEntries(entries) {
+        if (!entries.length) return;
+        const log = document.getElementById("mon-log");
+        const filter = document.getElementById("mon-filter").value.toLowerCase();
+        const paused = document.getElementById("mon-pause").checked;
+        const atBottom = log.scrollHeight - log.scrollTop <= log.clientHeight + 4;
+
+        for (const e of entries) {
+          const row = document.createElement("div");
+          row.className = "log-row";
+          row.dataset.text = `${e.type} ${e.summary}`.toLowerCase();
+
+          const ts = document.createElement("span");
+          ts.className = "log-ts";
+          ts.textContent = fmtTime(e.ts);
+
+          const dir = document.createElement("span");
+          dir.className = `log-dir log-dir-${e.dir}`;
+          dir.textContent = e.dir.toUpperCase();
+
+          const type = document.createElement("span");
+          type.className = "log-type";
+          type.textContent = e.type;
+
+          const summary = document.createElement("span");
+          summary.className = "log-summary";
+          summary.textContent = e.summary;
+
+          row.append(ts, dir, type, summary);
+
+          if (filter && !row.dataset.text.includes(filter)) {
+            row.classList.add("filtered");
+          }
+
+          log.appendChild(row);
+        }
+
+        // Cap at 1000 visible rows
+        while (log.children.length > 1000) log.removeChild(log.firstChild);
+
+        if (!paused && atBottom) log.scrollTop = log.scrollHeight;
+      }
+
+      async function pollMonitorLogs() {
+        try {
+          const res = await fetch(`/api/logs?since=${monitorCursor}`);
+          const { entries, cursor } = await res.json();
+          monitorCursor = cursor;
+          appendLogEntries(entries);
+        } catch { /* ignore */ }
+      }
+
+      function startMonitorPolling() {
+        if (monitorPollInterval) return;
+        pollMonitorLogs();
+        monitorPollInterval = setInterval(pollMonitorLogs, 1000);
+      }
+
+      function stopMonitorPolling() {
+        if (monitorPollInterval) { clearInterval(monitorPollInterval); monitorPollInterval = null; }
+      }
+
+      function clearMonitorLog() {
+        document.getElementById("mon-log").innerHTML = "";
+      }
+
+      function applyMonitorFilter() {
+        const filter = document.getElementById("mon-filter").value.toLowerCase();
+        document.querySelectorAll("#mon-log .log-row").forEach((row) => {
+          row.classList.toggle("filtered", !!filter && !row.dataset.text.includes(filter));
+        });
       }
 
       // ── Settings view ────────────────────────────────────────────────

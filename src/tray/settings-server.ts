@@ -89,6 +89,12 @@ export async function startSettingsServer(
         return Response.json(status, { headers: corsHeaders });
       }
 
+      if (url.pathname === '/api/logs') {
+        const since = url.searchParams.has('since') ? parseInt(url.searchParams.get('since')!) : undefined;
+        const result = bridge ? bridge.getLogs(since) : { entries: [], cursor: 0 };
+        return Response.json(result, { headers: corsHeaders });
+      }
+
       if (url.pathname === '/api/device/text' && req.method === 'POST') {
         if (!bridge) return Response.json({ ok: false, error: 'bridge not running' }, { headers: corsHeaders });
         const { text } = await req.json() as { text: string };

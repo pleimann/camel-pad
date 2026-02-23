@@ -69,6 +69,15 @@ export const MSG_SET_LABELS = 0x06;
 export const MSG_HEARTBEAT = 0x07;
 export const MSG_PING      = 0x08; // Host→Device: keepalive (no payload)
 
+// Monitor log entry
+export interface LogEntry {
+  seq: number;
+  ts: number;
+  dir: 'in' | 'out' | 'sys';
+  type: string;
+  summary: string;
+}
+
 // Gesture types
 export type GestureType = 'press' | 'doublePress' | 'longPress';
 
