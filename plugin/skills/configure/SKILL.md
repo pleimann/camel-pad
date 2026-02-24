@@ -1,5 +1,5 @@
 ---
-description: Use this skill when the user asks to "configure camel-pad", "set up camel-pad", "connect to macropad", "select HID device", or needs to configure the camel-pad bridge settings including device selection, endpoint URL, timeout, notification categories, or key mappings.
+description: Use this skill when the user asks to "configure camel-pad", "set up camel-pad", "connect to macropad", or needs to configure the camel-pad bridge settings including endpoint URL, timeout, notification categories, or key mappings.
 ---
 
 # Configure camel-pad Bridge
@@ -21,22 +21,11 @@ There are two configuration files:
 
 2. Use AskUserQuestion to gather configuration:
 
-   **HID Device Selection:**
-   - First, run the device listing script to get available devices:
-     ```bash
-     node ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/list-devices.js
-     ```
-   - Parse the JSON output to get the list of devices
-   - Look for a device whose name starts with "CamelPad" - this is the camel-pad device
-   - If a CamelPad device is found:
-     - Auto-select it and inform the user: "Found CamelPad device: [name] (Vendor: [vendor] Product: [product])"
-     - Ask: "Use this device?" with options "Yes (Recommended)", "Choose different device"
-     - If "Yes", use those vendorId/productId values
-   - If no CamelPad device found, or user chooses "Choose different device":
-     - Question: "Which HID device is your camel-pad?"
-     - Options: Build from device list, showing: "[name] ([manufacturer]) - Vendor: [vendor] Product: [product]"
-     - Add option "Enter manually" for cases where the device isn't detected
-   - If "Enter manually", ask for vendorId and productId as hex values (e.g., 0x1234)
+   **Bridge Device Settings:**
+   - Show the user the current `device.vendorId` and `device.productId` from `config.yaml`
+   - Question: "The bridge uses these device identifiers to find the serial port. The defaults (0x303A / 0x1001) work for the Waveshare ESP32-S3-LCD-3.16. Do you need to change them?"
+   - Options: "Use defaults (Recommended)", "Enter custom VID/PID"
+   - If "Enter custom VID/PID", ask for vendorId and productId as hex values (e.g., 0x1234)
    - Store the selected vendorId and productId
 
    **Endpoint URL:**
@@ -64,8 +53,6 @@ There are two configuration files:
    - Example edit - replace:
      ```yaml
      device:
-       # USB HID device identifiers
-       # Use `camel-pad --list-devices` to find your device
        vendorId: 0x1234
        productId: 0x5678
      ```
