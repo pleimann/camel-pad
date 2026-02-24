@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "camel-pad (dev)",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["--watch", "src/tray.ts"],
+      "port": 52914
+    },
+    {
+      "name": "camel-pad (start)",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "src/tray.ts"],
+      "port": 52914
+    }
+  ]
+}
