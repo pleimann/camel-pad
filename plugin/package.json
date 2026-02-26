@@ -4,6 +4,7 @@
   "private": true,
   "description": "Claude Code plugin for camel-pad notifications",
   "dependencies": {
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "yaml": "^2.8.2"
   }
 }
