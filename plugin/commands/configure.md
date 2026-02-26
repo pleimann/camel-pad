@@ -21,22 +21,11 @@ There are two configuration files:
 
 2. Use AskUserQuestion to gather configuration:
 
-   **HID Device Selection:**
-   - First, run the device listing script to get available devices:
-     ```bash
-     node ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/list-devices.js
-     ```
-   - Parse the JSON output to get the list of devices
-   - Look for a device whose name starts with "CamelPad" - this is the camel-pad device
-   - If a CamelPad device is found:
-     - Auto-select it and inform the user: "Found CamelPad device: [name] (Vendor: [vendor] Product: [product])"
-     - Ask: "Use this device?" with options "Yes (Recommended)", "Choose different device"
-     - If "Yes", use those vendorId/productId values
-   - If no CamelPad device found, or user chooses "Choose different device":
-     - Question: "Which HID device is your camel-pad?"
-     - Options: Build from device list, showing: "[name] ([manufacturer]) - Vendor: [vendor] Product: [product]"
-     - Add option "Enter manually" for cases where the device isn't detected
-   - If "Enter manually", ask for vendorId and productId as hex values (e.g., 0x1234)
+   **Bridge Device Settings:**
+   - Show the user the current `device.vendorId` and `device.productId` from `config.yaml`
+   - Question: "The bridge uses these device identifiers to find the serial port. The defaults (0x303A / 0x1001) work for the Waveshare ESP32-S3-LCD-3.16. Do you need to change them?"
+   - Options: "Use defaults (Recommended)", "Enter custom VID/PID"
+   - If "Enter custom VID/PID", ask for vendorId and productId as hex values (e.g., 0x1234)
    - Store the selected vendorId and productId
 
    **Endpoint URL:**
@@ -61,6 +50,13 @@ There are two configuration files:
 3. Write device settings to `config.yaml`:
    - Use the Edit tool to update the device section in config.yaml
    - Update vendorId and productId values (use uppercase hex format like 0x303A)
+   - Example edit - replace:
+     ```yaml
+     device:
+       vendorId: 0x1234
+       productId: 0x5678
+     ```
+     with the new values
 
 4. Write plugin settings to `.claude/camel-pad.local.md`:
 
@@ -87,6 +83,22 @@ keys:
 
 This file configures the camel-pad Claude Code plugin.
 Edit the YAML frontmatter above to change settings.
+
+## Settings Reference
+
+- `endpoint`: WebSocket URL for the camel-pad bridge server
+- `timeout`: Seconds to wait for a response from the device
+- `categories`: Which notification types to forward to camel-pad
+- `keys`: Button action mappings (action value and display label)
+
+## Note
+
+Device settings (vendorId, productId) are stored in `config.yaml`
+which is read by the camel-pad bridge process.
 ```
 
-5. Confirm: "Configuration saved. Run `/camel-pad:test` to verify connectivity."
+5. Confirm: "Configuration saved:
+   - Device settings → `config.yaml`
+   - Plugin settings → `.claude/camel-pad.local.md`"
+
+6. Suggest: "Run `/camel-pad:test` to verify connectivity."
