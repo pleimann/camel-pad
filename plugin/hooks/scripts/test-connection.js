@@ -38,23 +38,7 @@ function parseConfig(configPath) {
 }
 
 async function main() {
-  const config = parseConfig(configPath);
-
-  if (!config) {
-    console.log(JSON.stringify({
-      success: false,
-      error: 'No configuration found. Run /camel-pad:configure first.'
-    }));
-    process.exit(1);
-  }
-
-  if (!config.endpoint) {
-    console.log(JSON.stringify({
-      success: false,
-      error: 'No endpoint configured'
-    }));
-    process.exit(1);
-  }
+  const config = parseConfig(configPath) || { endpoint: 'ws://localhost:52914', timeout: 10 };
 
   const timeout = (config.timeout || 10) * 1000;
   const messageId = randomUUID();
@@ -72,7 +56,7 @@ async function main() {
         ws.send(JSON.stringify({
           type: 'test',
           id: messageId,
-          text: 'Test message from Claude Code',
+          text: 'This is a test message from Claude. Press any Key',
           category: 'test'
         }));
       });
@@ -92,7 +76,11 @@ async function main() {
 
       ws.on('error', (err) => {
         clearTimeout(timeoutId);
-        reject(err);
+        if (err.code === 'ECONNREFUSED') {
+          reject(new Error('Connection refused — is the Camel Pad app running?'));
+        } else {
+          reject(err);
+        }
       });
     });
 
