@@ -27,6 +27,23 @@ function remapButtonIndex(i: number, h: 'left' | 'right'): number {
   return h === 'right' ? 3 - i : i;
 }
 
+function extractLabels(config: any): string[] {
+  const labels: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    const keyId = `key${i}`;
+    const keyMapping = config.keys[keyId];
+
+    // Try to get label from press, then doublePress, then longPress
+    const label = keyMapping?.press?.label
+      || keyMapping?.doublePress?.label
+      || keyMapping?.longPress?.label
+      || '';
+
+    labels.push(label);
+  }
+  return labels;
+}
+
 export async function startBridge(configPath: string): Promise<BridgeHandle> {
   const configWatcher = new ConfigWatcher(configPath);
   const config = configWatcher.getConfig();
@@ -87,6 +104,13 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
     pushLog('sys', 'connected', `Connected${portPath ? ` — ${portPath}` : ''}`);
     emitStatus();
     serialDevice.sendStatus('Connected');
+
+    // Send button labels from config
+    const labels = extractLabels(config);
+    const reordered = handedness === 'right' ? [...labels].reverse() : labels;
+    pushLog('out', 'labels', labels.join(' | '));
+    serialDevice.sendLabels(reordered);
+
     pingInterval = setInterval(() => serialDevice.sendPing(), 5000);
   });
 
@@ -133,6 +157,14 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
       doublePressMs: newConfig.gestures.doublePressMs,
     });
     notificationServer.updateConfig(newConfig);
+
+    // Update button labels if connected
+    if (connected) {
+      const labels = extractLabels(newConfig);
+      const reordered = handedness === 'right' ? [...labels].reverse() : labels;
+      pushLog('out', 'labels', labels.join(' | '));
+      serialDevice.sendLabels(reordered);
+    }
   });
 
   // Start services
