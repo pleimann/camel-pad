@@ -12,6 +12,12 @@
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "src/tray.ts"],
       "port": 52914
+    },
+    {
+      "name": "tray-ui (preview)",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "9124", "--directory", "src/static"],
+      "port": 9124
     }
   ]
 }
