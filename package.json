@@ -11,7 +11,11 @@
     "build:x64": "bun build --compile --target bun-darwin-x64 --minify --outfile dist/camel-pad-tray-x64 src/tray.ts",
     "bundle:app": "bash scripts/build-app.sh"
   },
-  "keywords": ["macropad", "serial", "notifications"],
+  "keywords": [
+    "macropad",
+    "serial",
+    "notifications"
+  ],
   "license": "MIT",
   "dependencies": {
     "chokidar": "^3.6.0",

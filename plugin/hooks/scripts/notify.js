@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { randomUUID } = require('crypto');
 const yaml = require('yaml');
+const logger = require('./logger');
 
 // Read stdin
 let input = '';
@@ -21,7 +22,7 @@ process.stdin.on('end', async () => {
   try {
     await main(JSON.parse(input));
   } catch (err) {
-    console.error(JSON.stringify({ error: err.message }));
+    logger.error(err.message);
     process.exit(2);
   }
 });
@@ -48,7 +49,7 @@ function parseConfig(configPath) {
 
     return { endpoint, timeout };
   } catch (err) {
-    console.error('Error parsing config:', err.message);
+    logger.error('Error parsing config:', err.message);
     return null;
   }
 }
@@ -65,12 +66,12 @@ async function main(hookInput) {
   }
 
   if (!config.endpoint) {
-    console.error(JSON.stringify({ error: 'No endpoint configured' }));
+    logger.error('No endpoint configured');
     process.exit(2);
   }
 
   if (!config.timeout) {
-    console.error(JSON.stringify({ error: 'No timeout configured' }));
+    logger.error('No timeout configured');
     process.exit(2);
   }
 
@@ -96,15 +97,18 @@ async function main(hookInput) {
     }, timeoutMs);
 
     ws.on('open', () => {
-      ws.send(JSON.stringify({
+      const msg = {
         type: 'notification',
         id: messageId,
         text: notificationText,
         category: notificationCategory
-      }));
+      };
+      logger.send(msg);
+      ws.send(JSON.stringify(msg));
     });
 
     ws.on('message', (data) => {
+      logger.recv(data.toString());
       try {
         const response = JSON.parse(data.toString());
         if (response.type === 'response' && response.id === messageId) {
@@ -116,7 +120,7 @@ async function main(hookInput) {
           }
         }
       } catch (e) {
-        // Ignore parse errors, wait for valid response
+        logger.error('recv parse error:', e.message);
       }
     });
 

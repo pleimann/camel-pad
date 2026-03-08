@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { randomUUID } = require('crypto');
 const yaml = require('yaml');
+const logger = require('./logger');
 
 const { getConfigPath } = require('./config-path');
 
@@ -44,7 +45,7 @@ function parseConfig(configPath) {
 
     return { endpoint, timeout };
   } catch (err) {
-    console.error('Error parsing config:', err.message);
+    logger.error('Error parsing config:', err.message);
     return null;
   }
 }
@@ -89,15 +90,13 @@ async function main() {
       }, timeout);
 
       ws.on('open', () => {
-        ws.send(JSON.stringify({
-          type: 'message',
-          id: messageId,
-          text: message,
-          category: 'custom'
-        }));
+        const msg = { type: 'message', id: messageId, text: message, category: 'custom' };
+        logger.send(msg);
+        ws.send(JSON.stringify(msg));
       });
 
       ws.on('message', (data) => {
+        logger.recv(data.toString());
         try {
           const response = JSON.parse(data.toString());
           if (response.id === messageId) {
@@ -106,7 +105,7 @@ async function main() {
             resolve(response);
           }
         } catch (e) {
-          // Ignore parse errors
+          logger.error('recv parse error:', e.message);
         }
       });
 

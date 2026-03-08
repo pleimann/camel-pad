@@ -10,6 +10,7 @@ const path = require('path');
 const { randomUUID } = require('crypto');
 const yaml = require('yaml');
 const { getConfigPath } = require('./config-path');
+const logger = require('./logger');
 
 const configPath = getConfigPath();
 
@@ -53,15 +54,18 @@ async function main() {
       }, timeout);
 
       ws.on('open', () => {
-        ws.send(JSON.stringify({
+        const msg = {
           type: 'test',
           id: messageId,
           text: 'This is a test message from Claude. Press any Key',
           category: 'test'
-        }));
+        };
+        logger.send(msg);
+        ws.send(JSON.stringify(msg));
       });
 
       ws.on('message', (data) => {
+        logger.recv(data.toString());
         try {
           const response = JSON.parse(data.toString());
           if (response.id === messageId) {
@@ -70,7 +74,7 @@ async function main() {
             resolve(response);
           }
         } catch (e) {
-          // Ignore parse errors
+          logger.error('recv parse error:', e.message);
         }
       });
 
