@@ -107,7 +107,10 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
   serialDevice.on('button', ({ buttonId, pressed }) => {
     pushLog('in', 'button', `${buttonId} ${pressed ? 'pressed' : 'released'}`);
     const num = parseInt(buttonId.replace('key', ''));
-    const remapped = `key${remapButtonIndex(num, handedness)}`;
+    // Seesaw buttons are physically ordered in reverse relative to display zones
+    // (seesaw index 0 = rightmost zone, 3 = leftmost) due to 90° display rotation.
+    // Convert seesaw index to display zone first, then apply handedness mapping.
+    const remapped = `key${remapButtonIndex(3 - num, handedness)}`;
     gestureDetector.handleButton(remapped, pressed);
   });
 
@@ -152,11 +155,15 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
     serialDevice.sendText(message.text);
   });
 
-  // Clear display when all notifications are handled
+  // Clear display when all notifications are handled, then restore labels
   notificationServer.on('clear', () => {
+    const currentConfig = configWatcher.getConfig();
     pushLog('out', 'clear', 'Display cleared after response');
     console.log('Clearing display after response');
     serialDevice.clearDisplay();
+    const labels = extractLabelsForDisplay(currentConfig, handedness);
+    pushLog('out', 'labels', labels.join(' | '));
+    serialDevice.sendLabels(labels);
   });
 
   // Config reload events
@@ -216,7 +223,7 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
       return serialDevice.clearDisplay();
     },
     sendLeds(leds: Array<{ index: number; r: number; g: number; b: number }>): boolean {
-      const remapped = leds.map(led => ({ ...led, index: remapButtonIndex(led.index, handedness) }));
+      const remapped = leds.map(led => ({ ...led, index: 3 - remapButtonIndex(led.index, handedness) }));
       pushLog('out', 'leds', leds.map(l => `[${l.index}] #${[l.r, l.g, l.b].map(v => v.toString(16).padStart(2, '0')).join('')}`).join(' '));
       return serialDevice.sendLeds(remapped);
     },

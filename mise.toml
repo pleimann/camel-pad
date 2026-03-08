@@ -1,3 +1,13 @@
 [tools]
 bun = "latest"
 uv = "latest"
+
+[tasks.run]
+run = "bun run start"
+
+[tasks.build]
+shell = "bash"
+run = "scripts/build-app.sh"
+
+[tasks.test-notification]
+run = "bun run scripts/test-notifications.js"
