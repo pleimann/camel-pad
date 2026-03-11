@@ -74,12 +74,19 @@ export class NotificationServer extends EventEmitter {
       id: message.id,
       text: message.text,
       category: message.category,
+      options: message.options,
+      selectedIndex: 0,
       timeoutMs,
       timeoutHandle: setTimeout(() => {
         this.handleTimeout(ws, message.id);
       }, timeoutMs),
       resolve: (response) => {
-        ws.send(JSON.stringify(response));
+        try {
+          console.log(`Sending response for ${message.id}: ${JSON.stringify(response)}`);
+          ws.send(JSON.stringify(response));
+        } catch (err) {
+          console.error(`Failed to send response for ${message.id}:`, err);
+        }
       },
       reject: (error) => {
         const errorMsg: ErrorMessage = {
@@ -95,17 +102,29 @@ export class NotificationServer extends EventEmitter {
     this.notificationQueue.push(message.id);
 
     // Emit event to display on device
-    this.emit('notification', message);
+    if (pending.options && pending.options.length > 0) {
+      // Selection mode: show formatted options and update button labels
+      this.emitSelectionDisplay(pending);
+      this.emit('labelsUpdate', ['\u25BC', '\u25B2', '\u2713', '\u2717']);
+    } else {
+      this.emit('notification', message);
+    }
   }
 
   private handleTimeout(ws: WebSocket, id: string): void {
     const pending = this.pending.get(id);
     if (!pending) return;
 
+    const hadOptions = pending.options && pending.options.length > 0;
+
     this.pending.delete(id);
     this.notificationQueue = this.notificationQueue.filter(nid => nid !== id);
 
     pending.reject(new Error(`Timeout after ${pending.timeoutMs}ms`));
+
+    if (hadOptions) {
+      this.emit('labelsRestore');
+    }
   }
 
   handleGesture(buttonId: string, gesture: GestureType): boolean {
@@ -121,7 +140,12 @@ export class NotificationServer extends EventEmitter {
       return false;
     }
 
-    // Look up action for this button + gesture
+    // Selection mode: fixed key assignments for navigation
+    if (pending.options && pending.options.length > 0 && gesture === 'press') {
+      return this.handleSelectionGesture(pending, oldestId, buttonId);
+    }
+
+    // Normal mode: look up action for this button + gesture in config
     const keyMapping = this.config.keys[buttonId];
     if (!keyMapping) {
       console.warn(`No mapping for button: ${buttonId}`);
@@ -145,28 +169,108 @@ export class NotificationServer extends EventEmitter {
       id: oldestId,
       action: actionMapping.action,
       label: actionMapping.label,
+      buttonId,
     };
 
     pending.resolve(response);
+    this.showNextOrClear();
 
-    // Emit event for next notification display or clear if queue is empty
+    return true;
+  }
+
+  private handleSelectionGesture(pending: PendingNotification, id: string, buttonId: string): boolean {
+    const idx = pending.selectedIndex;
+    const maxIdx = pending.options!.length - 1;
+    console.log(`Selection gesture: ${buttonId} (current index: ${idx}/${maxIdx})`);
+
+    switch (buttonId) {
+      case 'key0': // Down
+        pending.selectedIndex = Math.min(idx + 1, maxIdx);
+        this.emitSelectionDisplay(pending);
+        return true;
+
+      case 'key1': // Up
+        pending.selectedIndex = Math.max(idx - 1, 0);
+        this.emitSelectionDisplay(pending);
+        return true;
+
+      case 'key2': { // Enter — select current option
+        clearTimeout(pending.timeoutHandle);
+        this.pending.delete(id);
+        this.notificationQueue.shift();
+
+        const selected = pending.options![pending.selectedIndex];
+        const response: ResponseMessage = {
+          type: 'response',
+          id,
+          action: 'select',
+          label: selected,
+          buttonId,
+          selectedIndex: pending.selectedIndex,
+        };
+        pending.resolve(response);
+        this.emit('labelsRestore');
+        this.showNextOrClear();
+        return true;
+      }
+
+      case 'key3': { // Cancel
+        clearTimeout(pending.timeoutHandle);
+        this.pending.delete(id);
+        this.notificationQueue.shift();
+
+        const response: ResponseMessage = {
+          type: 'response',
+          id,
+          action: 'cancel',
+          label: 'Cancel',
+          buttonId,
+        };
+        pending.resolve(response);
+        this.emit('labelsRestore');
+        this.showNextOrClear();
+        return true;
+      }
+
+      default:
+        return false;
+    }
+  }
+
+  private emitSelectionDisplay(pending: PendingNotification): void {
+    const idx = pending.selectedIndex;
+    const lines = pending.options!.map((opt, i) =>
+      i === idx ? `\u25B6 ${opt}` : `  ${opt}`
+    );
+    const text = `${pending.text}\n\n${lines.join('\n')}`;
+    this.emit('notification', {
+      type: 'notification' as const,
+      id: pending.id,
+      text,
+      category: pending.category,
+    });
+  }
+
+  private showNextOrClear(): void {
     if (this.notificationQueue.length > 0) {
       const nextId = this.notificationQueue[0];
       const next = this.pending.get(nextId);
       if (next) {
-        this.emit('notification', {
-          type: 'notification',
-          id: next.id,
-          text: next.text,
-          category: next.category,
-        });
+        if (next.options && next.options.length > 0) {
+          this.emitSelectionDisplay(next);
+          this.emit('labelsUpdate', ['\u25BC', '\u25B2', '\u2713', '\u2717']);
+        } else {
+          this.emit('notification', {
+            type: 'notification',
+            id: next.id,
+            text: next.text,
+            category: next.category,
+          });
+        }
       }
     } else {
-      // No more notifications — clear the display
       this.emit('clear');
     }
-
-    return true;
   }
 
   hasPending(): boolean {

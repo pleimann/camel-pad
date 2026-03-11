@@ -166,6 +166,26 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
     serialDevice.sendLabels(labels);
   });
 
+  // Selection mode: update button labels (▼ ▲ ✓ ✗)
+  notificationServer.on('labelsUpdate', (labels: string[]) => {
+    // Labels are in logical key order (key0–key3), remap to physical
+    const physicalLabels: string[] = [];
+    for (let physicalPos = 0; physicalPos <= 3; physicalPos++) {
+      const logicalKey = remapButtonIndex(physicalPos, handedness);
+      physicalLabels.push(labels[logicalKey] || '');
+    }
+    pushLog('out', 'labels', physicalLabels.join(' | '));
+    serialDevice.sendLabels(physicalLabels);
+  });
+
+  // Selection mode ended: restore config labels
+  notificationServer.on('labelsRestore', () => {
+    const currentConfig = configWatcher.getConfig();
+    const labels = extractLabelsForDisplay(currentConfig, handedness);
+    pushLog('out', 'labels', labels.join(' | '));
+    serialDevice.sendLabels(labels);
+  });
+
   // Config reload events
   configWatcher.on('reload', (newConfig) => {
     pushLog('sys', 'config', 'Configuration reloaded');

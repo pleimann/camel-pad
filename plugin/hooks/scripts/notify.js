@@ -79,6 +79,14 @@ async function main(hookInput) {
   const notificationText = hookInput.notification_text || hookInput.message || '';
   const notificationCategory = hookInput.notification_category || hookInput.category || 'unknown';
 
+  // AskUserQuestion fires a 'permission_prompt' notification, but it's already
+  // handled by the PreToolUse hook (ask-user-question.js). Skip it here to avoid
+  // a duplicate notification on the device requiring a second button press.
+  if (notificationCategory === 'permission_prompt') {
+    console.log(JSON.stringify({ continue: true }));
+    return;
+  }
+
   // Connect to WebSocket and send notification
   const messageId = randomUUID();
   const ws = new WebSocket(config.endpoint);

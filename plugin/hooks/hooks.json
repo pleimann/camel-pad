@@ -1,6 +1,30 @@
 {
   "description": "Forward Claude Code notifications to camel-pad device",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/ask-user-question.js",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/stop.js",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "*",

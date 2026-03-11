@@ -38,6 +38,7 @@ export interface NotificationMessage {
   id: string;
   text: string;
   category?: string;
+  options?: string[];
 }
 
 export interface ResponseMessage {
@@ -45,6 +46,8 @@ export interface ResponseMessage {
   id: string;
   action: string;
   label: string;
+  buttonId?: string;
+  selectedIndex?: number;
 }
 
 export interface ErrorMessage {
@@ -91,6 +94,8 @@ export interface PendingNotification {
   id: string;
   text: string;
   category?: string;
+  options?: string[];
+  selectedIndex: number;
   timeoutMs: number;
   timeoutHandle: ReturnType<typeof setTimeout>;
   resolve: (response: ResponseMessage) => void;
