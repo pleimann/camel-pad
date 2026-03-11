@@ -1,4 +1,4 @@
-27262443900537460
+27267762841478707
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -107905,6 +107905,13 @@ Varistor VF
 2
 2
 camelpad
+CONN_53398_04_MOL
+
+533980471 
+0
+6
+6
+camelpad
 D_SOD-323
 SOD-323
 SOD-323
@@ -107932,6 +107939,20 @@ LED-SMD_4P-L2.0-W2.0-TL_WS2812B-2020
 0
 4
 4
+camelpad
+Molex_PicoBlade_53047-0610_1x06_P1.25mm_Vertical
+Molex PicoBlade Connector System, 53047-0610, 6 Pins per row (http://www.molex.com/pdm_docs/sd/530470610_sd.pdf), generated with kicad-footprint-generator
+connector Molex PicoBlade vertical
+0
+6
+6
+camelpad
+Molex_PicoBlade_53398-0471_1x04-1MP_P1.25mm_Vertical
+Molex PicoBlade series connector, 53398-0471 (http://www.molex.com/pdm_docs/sd/533980271_sd.pdf), generated with kicad-footprint-generator
+connector Molex PicoBlade vertical
+0
+6
+5
 camelpad
 R_0402_1005Metric
 Resistor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator
