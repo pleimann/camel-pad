@@ -101,6 +101,10 @@
         --dir-sys-bg: rgba(0, 0, 0, 0.05);
       }
 
+      html {
+        height: 100%;
+      }
+
       body {
         font-family: var(--sans);
         font-size: 13px;
@@ -121,6 +125,10 @@
         min-width: 480px;
         max-width: 600px;
         margin: 0 auto;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
 
       /* ── App header ── */
@@ -204,6 +212,8 @@
       /* ── Content ── */
       .content {
         padding: 16px 20px 24px;
+        flex: 1;
+        overflow-y: auto;
       }
 
       /* ── Views ── */
