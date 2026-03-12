@@ -5,7 +5,7 @@ uv = "latest"
 [tasks.run]
 run = "bun run start"
 
-[tasks.build]
+[tasks.build-app]
 shell = "bash"
 run = "scripts/build-app.sh"
 

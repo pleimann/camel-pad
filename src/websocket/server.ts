@@ -69,6 +69,30 @@ export class NotificationServer extends EventEmitter {
 
     const timeoutMs = this.config.defaults.timeoutMs;
 
+    // If a plain notification (no options) arrives while there is already an active
+    // selection question at the head of the queue, auto-dismiss it immediately.
+    // This prevents a concurrent Notification hook (e.g. "Claude needs your attention")
+    // from overwriting the selection menu on the device.
+    const activeId = this.notificationQueue[0];
+    const activeHasOptions = activeId
+      ? (this.pending.get(activeId)?.options?.length ?? 0) > 0
+      : false;
+
+    if (!message.options?.length && activeHasOptions) {
+      const autoResponse: ResponseMessage = {
+        type: 'response',
+        id: message.id,
+        action: 'acknowledge',
+        label: '',
+      };
+      try {
+        ws.send(JSON.stringify(autoResponse));
+      } catch (err) {
+        console.error(`Failed to auto-dismiss notification ${message.id}:`, err);
+      }
+      return;
+    }
+
     // Create pending notification
     const pending: PendingNotification = {
       id: message.id,
@@ -103,12 +127,42 @@ export class NotificationServer extends EventEmitter {
 
     // Emit event to display on device
     if (pending.options && pending.options.length > 0) {
-      // Selection mode: show formatted options and update button labels
+      // Selection mode: auto-dismiss any plain notifications that arrived before this
+      // question (e.g. a concurrent "Claude needs your attention") so they don't block
+      // the selection from being at the head of the queue.
+      this.autoDismissLeadingPlain(message.id);
       this.emitSelectionDisplay(pending);
       this.emit('labelsUpdate', ['\u25BC', '\u25B2', '\u2713', '\u2717']);
     } else {
       this.emit('notification', message);
     }
+  }
+
+  // Resolve and remove all plain (no-options) notifications that precede `keepId`
+  // in the queue by sending an automatic acknowledgement response to their callers.
+  private autoDismissLeadingPlain(keepId: string): void {
+    const toRemove: string[] = [];
+    for (const id of this.notificationQueue) {
+      if (id === keepId) break;
+      const p = this.pending.get(id);
+      if (p && (!p.options || p.options.length === 0)) {
+        toRemove.push(id);
+      }
+    }
+    if (toRemove.length === 0) return;
+    for (const id of toRemove) {
+      const p = this.pending.get(id)!;
+      clearTimeout(p.timeoutHandle);
+      this.pending.delete(id);
+      const response: ResponseMessage = {
+        type: 'response',
+        id,
+        action: 'acknowledge',
+        label: '',
+      };
+      p.resolve(response);
+    }
+    this.notificationQueue = this.notificationQueue.filter(id => !toRemove.includes(id));
   }
 
   private handleTimeout(ws: WebSocket, id: string): void {
@@ -128,6 +182,42 @@ export class NotificationServer extends EventEmitter {
   }
 
   handleGesture(buttonId: string, gesture: GestureType): boolean {
+    // Look up the configured action for this button + gesture first, so that
+    // special actions (like "clear") can fire even with no pending notifications.
+    const keyMapping = this.config.keys[buttonId];
+    if (!keyMapping) {
+      console.warn(`No mapping for button: ${buttonId}`);
+      return false;
+    }
+
+    const actionMapping = keyMapping[gesture];
+    if (!actionMapping) {
+      console.warn(`No mapping for gesture: ${buttonId}.${gesture}`);
+      return false;
+    }
+
+    // "reset" action: dismiss all pending notifications and reset the display.
+    // Works whether or not there are pending notifications.
+    if (actionMapping.action.toLowerCase() === 'reset') {
+      for (const id of [...this.notificationQueue]) {
+        const p = this.pending.get(id);
+        if (!p) continue;
+        clearTimeout(p.timeoutHandle);
+        this.pending.delete(id);
+        const response: ResponseMessage = {
+          type: 'response',
+          id,
+          action: 'cancel',
+          label: actionMapping.label,
+          buttonId,
+        };
+        p.resolve(response);
+      }
+      this.notificationQueue = [];
+      this.emit('clear');
+      return true;
+    }
+
     // Get the oldest pending notification
     if (this.notificationQueue.length === 0) {
       return false;
@@ -143,19 +233,6 @@ export class NotificationServer extends EventEmitter {
     // Selection mode: fixed key assignments for navigation
     if (pending.options && pending.options.length > 0 && gesture === 'press') {
       return this.handleSelectionGesture(pending, oldestId, buttonId);
-    }
-
-    // Normal mode: look up action for this button + gesture in config
-    const keyMapping = this.config.keys[buttonId];
-    if (!keyMapping) {
-      console.warn(`No mapping for button: ${buttonId}`);
-      return false;
-    }
-
-    const actionMapping = keyMapping[gesture];
-    if (!actionMapping) {
-      console.warn(`No mapping for gesture: ${buttonId}.${gesture}`);
-      return false;
     }
 
     // Clear timeout and remove from queue
