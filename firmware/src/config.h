@@ -70,9 +70,10 @@
 #define SCREEN_HEIGHT 320
 
 // ----- Font Sizes -----
-#define FONT_STATUS   &lv_font_montserrat_24
-#define FONT_NOTIF    &lv_font_montserrat_28
-#define FONT_BUTTON   &lv_font_montserrat_32
+#include "fonts/fonts.h"
+#define FONT_STATUS   &lv_font_deja_24
+#define FONT_NOTIF    &lv_font_deja_28
+#define FONT_BUTTON   &lv_font_deja_32
 
 // ----- Communication Protocol -----
 #define MSG_DISPLAY_TEXT 0x01

@@ -11,3 +11,11 @@ run = "scripts/build-app.sh"
 
 [tasks.test-notification]
 run = "bun run scripts/test-notifications.js"
+
+[tasks.firmware-build]
+dir = "firmware"
+run = ".venv/bin/platformio run"
+
+[tasks.firmware-upload]
+dir = "firmware"
+run = ".venv/bin/platformio run --target upload"
