@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { parse } from 'yaml';
-import type { Config } from '../types.js';
+import type { Config, ActionMapping, KeyMapping } from '../types.js';
 
 const DEFAULT_CONFIG: Config = {
   device: {},
@@ -33,7 +33,62 @@ export function loadConfig(path: string): Config {
   }
 }
 
+function normalizeActionMapping(raw: any): ActionMapping | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+
+  // Already has explicit type
+  if (raw.type === 'action') {
+    return { type: 'action', action: raw.action || '', label: raw.label || '' };
+  }
+  if (raw.type === 'keybinding') {
+    return { type: 'keybinding', keybinding: raw.keybinding || '', label: raw.label || '' };
+  }
+  if (raw.type === 'global') {
+    return { type: 'global', keybinding: raw.keybinding || '', label: raw.label || '' };
+  }
+
+  // Legacy keys: ["ctrl+c"] format
+  if (Array.isArray(raw.keys)) {
+    return { type: 'global', keybinding: raw.keys.join(', '), label: raw.label || '' };
+  }
+
+  // Legacy { action, label } format (no type field)
+  if (raw.action) {
+    return { type: 'action', action: raw.action, label: raw.label || '' };
+  }
+
+  return undefined;
+}
+
+function normalizeKeys(keys: Record<string, any>): Record<string, KeyMapping> {
+  const result: Record<string, KeyMapping> = {};
+  const gestureFields = ['press', 'doublePress', 'double_press', 'longPress', 'long_press'] as const;
+  const canonicalName: Record<string, keyof KeyMapping> = {
+    press: 'press',
+    doublePress: 'doublePress',
+    double_press: 'doublePress',
+    longPress: 'longPress',
+    long_press: 'longPress',
+  };
+
+  for (const [keyId, rawMapping] of Object.entries(keys)) {
+    if (!rawMapping || typeof rawMapping !== 'object') continue;
+    const keyMapping: KeyMapping = {};
+    for (const field of gestureFields) {
+      if (rawMapping[field]) {
+        const normalized = normalizeActionMapping(rawMapping[field]);
+        if (normalized) {
+          keyMapping[canonicalName[field]] = normalized;
+        }
+      }
+    }
+    result[keyId] = keyMapping;
+  }
+  return result;
+}
+
 function mergeConfig(defaults: Config, overrides: Partial<Config>): Config {
+  const rawKeys = overrides.keys || defaults.keys;
   return {
     device: {
       ...defaults.device,
@@ -47,7 +102,7 @@ function mergeConfig(defaults: Config, overrides: Partial<Config>): Config {
       ...defaults.gestures,
       ...overrides.gestures,
     },
-    keys: overrides.keys || defaults.keys,
+    keys: normalizeKeys(rawKeys),
     defaults: {
       ...defaults.defaults,
       ...overrides.defaults,

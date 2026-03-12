@@ -1,6 +1,7 @@
 import AppKit
 import WebKit
 import Foundation
+import CoreGraphics
 
 // ─── IPC helpers ─────────────────────────────────────────────────────────────
 
@@ -130,6 +131,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let url = URL(string: urlStr) { showPopover(url: url, width: width, height: height) }
         } else if type == "hide-popover" {
             closePopover()
+        } else if type == "simulate-key" {
+            if let combo = obj["combo"] as? String {
+                // Run on a background queue so the sleep between sequences
+                // doesn't block the main thread / IPC reader.
+                DispatchQueue.global(qos: .userInteractive).async {
+                    simulateKeySequence(combo)
+                }
+            }
         } else if type == "exit" {
             NSApp.terminate(nil)
         }
@@ -257,6 +266,86 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func stopEventMonitor() {
         if let m = eventMonitor { NSEvent.removeMonitor(m); eventMonitor = nil }
+    }
+}
+
+// ─── Key simulation ──────────────────────────────────────────────────────────
+
+private let modifierMap: [String: CGEventFlags] = [
+    "ctrl": .maskControl, "control": .maskControl,
+    "alt": .maskAlternate, "option": .maskAlternate,
+    "shift": .maskShift,
+    "meta": .maskCommand, "cmd": .maskCommand, "command": .maskCommand,
+    "super": .maskCommand, "win": .maskCommand,
+]
+
+private let keyCodeMap: [String: CGKeyCode] = [
+    "enter": 36, "return": 36, "tab": 48,
+    "esc": 53, "escape": 53, "space": 49,
+    "backspace": 51, "delete": 117,
+    "up": 126, "down": 125, "left": 123, "right": 124,
+    "home": 115, "end": 119,
+    "pageup": 116, "pgup": 116, "pagedown": 121, "pgdn": 121,
+    "f1": 122, "f2": 120, "f3": 99, "f4": 118, "f5": 96, "f6": 97,
+    "f7": 98, "f8": 100, "f9": 101, "f10": 109, "f11": 103, "f12": 111,
+]
+
+// Maps single printable characters to their virtual key codes.
+// Only the most common keys; others fall back to CGEvent character posting.
+private let charKeyCodeMap: [Character: CGKeyCode] = [
+    "a": 0, "b": 11, "c": 8, "d": 2, "e": 14, "f": 3, "g": 5, "h": 4,
+    "i": 34, "j": 38, "k": 40, "l": 37, "m": 46, "n": 45, "o": 31,
+    "p": 35, "q": 12, "r": 15, "s": 1, "t": 17, "u": 32, "v": 9,
+    "w": 13, "x": 7, "y": 16, "z": 6,
+    "0": 29, "1": 18, "2": 19, "3": 20, "4": 21, "5": 23,
+    "6": 22, "7": 26, "8": 28, "9": 25,
+    "-": 27, "=": 24, "[": 33, "]": 30, "\\": 42, ";": 41,
+    "'": 39, ",": 43, ".": 47, "/": 44, "`": 50,
+]
+
+func simulateKeyCombination(_ combo: String) {
+    let parts = combo.lowercased().trimmingCharacters(in: .whitespaces).split(separator: "+").map { $0.trimmingCharacters(in: .whitespaces) }
+
+    var flags = CGEventFlags()
+    var keyPart = ""
+
+    for part in parts {
+        if let mod = modifierMap[part] {
+            flags.insert(mod)
+        } else {
+            keyPart = part
+        }
+    }
+
+    // Resolve key code
+    var keyCode: CGKeyCode
+    if let code = keyCodeMap[keyPart] {
+        keyCode = code
+    } else if keyPart.count == 1, let ch = keyPart.first, let code = charKeyCodeMap[ch] {
+        keyCode = code
+    } else {
+        // Unknown key — skip
+        return
+    }
+
+    let src = CGEventSource(stateID: .hidSystemState)
+    guard let down = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: true),
+          let up   = CGEvent(keyboardEventSource: src, virtualKey: keyCode, keyDown: false)
+    else { return }
+
+    down.flags = flags
+    up.flags = flags
+    down.post(tap: .cghidEventTap)
+    up.post(tap: .cghidEventTap)
+}
+
+func simulateKeySequence(_ sequence: String) {
+    let combos = sequence.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+    for (i, combo) in combos.enumerated() {
+        if i > 0 {
+            Thread.sleep(forTimeInterval: 0.05)
+        }
+        simulateKeyCombination(combo)
     }
 }
 

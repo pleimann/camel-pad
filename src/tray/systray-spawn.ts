@@ -35,6 +35,7 @@ export interface SysTrayHandle {
   updateConfig(config: Record<string, unknown>): void;
   showPopover(url: string, width?: number, height?: number): void;
   hidePopover(): void;
+  simulateKey(combo: string): void;
   kill(): void;
   onExit(cb: () => void): void;
 }
@@ -153,6 +154,9 @@ export function spawnSysTray(
           },
           hidePopover() {
             proc.stdin.write(JSON.stringify({ type: 'hide-popover' }) + '\n');
+          },
+          simulateKey(combo: string) {
+            proc.stdin.write(JSON.stringify({ type: 'simulate-key', combo }) + '\n');
           },
           kill() {
             proc.stdin.write(JSON.stringify({ type: 'exit' }) + '\n');

@@ -27,8 +27,23 @@ export interface KeyMapping {
   longPress?: ActionMapping;
 }
 
-export interface ActionMapping {
+export type ActionMapping = ActionAction | KeybindingAction | GlobalAction;
+
+export interface ActionAction {
+  type: 'action';
   action: string;
+  label: string;
+}
+
+export interface KeybindingAction {
+  type: 'keybinding';
+  keybinding: string;
+  label: string;
+}
+
+export interface GlobalAction {
+  type: 'global';
+  keybinding: string;
   label: string;
 }
 

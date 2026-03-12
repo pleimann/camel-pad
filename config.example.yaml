@@ -20,42 +20,60 @@ gestures:
   doublePressMs: 300 # Window to detect double-press
 
 # Button mappings
-# index: 0-based button number on the macropad
-# name: optional human-readable name for logging
+# Each gesture can be one of three types:
+#   type: action     — sends the action string to Claude Code via WebSocket (approve, deny, reset)
+#   type: keybinding — sends a key combo string to Claude Code via WebSocket
+#   type: global     — simulates a keypress on the host machine via AppleScript
 keys:
   key0:
     press:
-      keys: ["ctrl+c"]
-    double_press:
-      keys: ["ctrl+z"]
-    long_press:
-      keys: ["q", "enter"] # Sequence of keys
+      type: action
+      action: approve
+      label: "Yes"
 
   key1:
     press:
-      keys: ["down"]
+      type: keybinding
+      keybinding: "down"
+      label: "Down"
     double_press:
-      keys: ["pagedown"]
+      type: keybinding
+      keybinding: "pagedown"
+      label: "PgDn"
     long_press:
-      keys: ["end"]
+      type: keybinding
+      keybinding: "end"
+      label: "End"
 
   key2:
     press:
-      keys: ["up"]
+      type: keybinding
+      keybinding: "up"
+      label: "Up"
     double_press:
-      keys: ["pageup"]
+      type: keybinding
+      keybinding: "pageup"
+      label: "PgUp"
     long_press:
-      keys: ["home"]
+      type: keybinding
+      keybinding: "home"
+      label: "Home"
 
   key3:
     press:
-      keys: ["enter"]
+      type: global
+      keybinding: "enter"
+      label: "Enter"
     double_press:
-      keys: ["tab"]
+      type: global
+      keybinding: "tab"
+      label: "Tab"
     long_press:
-      keys: ["esc"]
+      type: global
+      keybinding: "esc"
+      label: "Esc"
 
-# Key Format Reference
+# Key Format Reference (for keybinding and global types)
 # ====================
 # Modifiers: ctrl+, alt+, shift+, meta+ (or cmd+, command+, win+, super+)
 # Special keys: enter, tab, esc, space, backspace, delete, insert
@@ -63,6 +81,7 @@ keys:
 #               up, down, left, right
 #               f1-f12
 # Printable: single characters like a, 1, /
+# Sequences: comma-separated (e.g. "q, enter" sends q then enter)
 #
 # Examples:
 #   "ctrl+c"         - Control-C (interrupt)
@@ -70,3 +89,4 @@ keys:
 #   "alt+f4"         - Alt-F4
 #   "enter"          - Enter/Return key
 #   "a"              - Letter 'a'
+#   "q, enter"       - Key sequence: q then enter

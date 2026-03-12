@@ -57,7 +57,11 @@ function extractLabelsForDisplay(config: any, handedness: 'left' | 'right'): str
   return physicalLabels;
 }
 
-export async function startBridge(configPath: string): Promise<BridgeHandle> {
+export interface BridgeOptions {
+  simulateKey?: (combo: string) => void;
+}
+
+export async function startBridge(configPath: string, options?: BridgeOptions): Promise<BridgeHandle> {
   const configWatcher = new ConfigWatcher(configPath);
   const config = configWatcher.getConfig();
 
@@ -137,10 +141,28 @@ export async function startBridge(configPath: string): Promise<BridgeHandle> {
     emitStatus();
   });
 
-  // Gesture events → Notification server
-  gestureDetector.on('gesture', ({ buttonId, gesture }) => {
+  // Gesture events → Route by action type
+  gestureDetector.on('gesture', async ({ buttonId, gesture }) => {
     pushLog('in', 'gesture', `${buttonId} ${gesture}`);
     console.log(`Gesture: ${buttonId} ${gesture}`);
+
+    const currentCfg = configWatcher.getConfig();
+    const keyMapping = currentCfg.keys[buttonId];
+    const actionMapping = keyMapping?.[gesture as keyof typeof keyMapping];
+
+    if (!actionMapping) {
+      console.warn(`No mapping for ${buttonId}.${gesture}`);
+      return;
+    }
+
+    if (actionMapping.type === 'global') {
+      pushLog('out', 'global', actionMapping.keybinding);
+      console.log(`Global keybinding: ${actionMapping.keybinding}`);
+      options?.simulateKey?.(actionMapping.keybinding);
+      return;
+    }
+
+    // type === 'action' or 'keybinding' — delegate to notification server
     const handled = notificationServer.handleGesture(buttonId, gesture);
     if (!handled && !notificationServer.hasPending()) {
       console.log('No pending notifications');

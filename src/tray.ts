@@ -29,7 +29,9 @@ async function tryStartBridge() {
     return null;
   }
   try {
-    const handle = await startBridge(configPath);
+    const handle = await startBridge(configPath, {
+      simulateKey: (combo) => tray?.simulateKey(combo),
+    });
     handle.onStatusChange((status) => {
       tray?.updateItem(ITEM_STATUS, {
         title: status.connected ? '● Connected' : '○ Disconnected',

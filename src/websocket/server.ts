@@ -196,9 +196,20 @@ export class NotificationServer extends EventEmitter {
       return false;
     }
 
+    // Only action and keybinding types should reach here (global is handled in bridge.ts)
+    if (actionMapping.type === 'global') {
+      console.warn(`Global mapping reached handleGesture: ${buttonId}.${gesture}`);
+      return false;
+    }
+
+    // Derive the action string: for 'action' type use .action, for 'keybinding' use .keybinding
+    const actionStr = actionMapping.type === 'keybinding'
+      ? actionMapping.keybinding
+      : actionMapping.action;
+
     // "reset" action: dismiss all pending notifications and reset the display.
     // Works whether or not there are pending notifications.
-    if (actionMapping.action.toLowerCase() === 'reset') {
+    if (actionMapping.type === 'action' && actionStr.toLowerCase() === 'reset') {
       for (const id of [...this.notificationQueue]) {
         const p = this.pending.get(id);
         if (!p) continue;
@@ -244,7 +255,7 @@ export class NotificationServer extends EventEmitter {
     const response: ResponseMessage = {
       type: 'response',
       id: oldestId,
-      action: actionMapping.action,
+      action: actionStr,
       label: actionMapping.label,
       buttonId,
     };

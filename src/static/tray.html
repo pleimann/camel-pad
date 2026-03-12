@@ -110,17 +110,16 @@
         font-size: 13px;
         line-height: 1.5;
         background: var(--bg);
-        background-image: radial-gradient(
+        background-image:
+          radial-gradient(
             ellipse 80% 40% at 50% 0%,
             var(--glow-color) 0%,
             transparent 70%
           ),
-          radial-gradient(
-            circle,
-            var(--dot-color) 1px,
-            transparent 1px
-          );
-        background-size: auto, 22px 22px;
+          radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+        background-size:
+          auto,
+          22px 22px;
         color: var(--text);
         min-width: 480px;
         max-width: 600px;
@@ -865,7 +864,7 @@
       }
 
       .kb-gesture-label {
-        flex: 0 0 96px;
+        flex: 0 0 56px;
         font-size: 13px;
         color: var(--text);
       }
@@ -886,7 +885,8 @@
         padding: 5px 0;
       }
 
-      .kb-gesture-row input[type="text"] {
+      .kb-gesture-row input[type="text"],
+      .kb-gesture-row select {
         flex: 1;
         min-width: 0;
         height: 28px;
@@ -901,9 +901,21 @@
         transition:
           border-color 0.15s,
           box-shadow 0.15s;
+        -webkit-appearance: none;
+        appearance: none;
       }
 
-      .kb-gesture-row input[type="text"]:focus {
+      .kb-gesture-row select {
+        cursor: pointer;
+        flex: 0 0 100px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        padding-right: 22px;
+      }
+
+      .kb-gesture-row input[type="text"]:focus,
+      .kb-gesture-row select:focus {
         border-color: var(--accent);
         box-shadow: 0 0 0 2px var(--accent-glow);
       }
@@ -1027,11 +1039,7 @@
       <button class="tab-btn" data-tab="keys" onclick="switchTab('keys')">
         Keys
       </button>
-      <button
-        class="tab-btn"
-        data-tab="monitor"
-        onclick="switchTab('monitor')"
-      >
+      <button class="tab-btn" data-tab="monitor" onclick="switchTab('monitor')">
         Monitor
       </button>
     </nav>
@@ -1216,12 +1224,7 @@
           <h2>Orientation</h2>
           <div class="device-mode">
             <label
-              ><input
-                type="radio"
-                name="handedness"
-                value="right"
-                checked
-              />
+              ><input type="radio" name="handedness" value="right" checked />
               Right-handed</label
             >
             <label
@@ -1353,8 +1356,7 @@
       function updateThemeIcon() {
         const btn = document.getElementById("theme-toggle");
         if (btn)
-          btn.innerHTML =
-            getEffectiveTheme() === "dark" ? ICON_SUN : ICON_MOON;
+          btn.innerHTML = getEffectiveTheme() === "dark" ? ICON_SUN : ICON_MOON;
       }
 
       function toggleTheme() {
@@ -1506,10 +1508,12 @@
 
       const KB_KEY_NAMES = ["Key 1", "Key 2", "Key 3", "Key 4"];
       const KB_GESTURES = [
-        { id: "press", snake: "press", label: "Press" },
-        { id: "doublePress", snake: "double_press", label: "Double Press" },
-        { id: "longPress", snake: "long_press", label: "Long Press" },
+        { id: "press", snake: "press", label: "1x" },
+        { id: "doublePress", snake: "double_press", label: "2x" },
+        { id: "longPress", snake: "long_press", label: "Long" },
       ];
+
+      const KB_ACTIONS = ["approve", "deny", "reset"];
 
       function renderKeybindings(keys) {
         const container = document.getElementById("view-keys");
@@ -1519,9 +1523,10 @@
         const hint = document.createElement("p");
         hint.className = "kb-hint";
         hint.textContent =
-          "Map each button gesture to an action returned to Claude Code. " +
-          'Action is the value sent on response (e.g. "approve"); ' +
-          'Label is shown on the device display (e.g. "Yes").';
+          "Map each button gesture to an action (sent to Claude Code), " +
+          "a keybinding (sent to Claude Code as a key combo), " +
+          "or a global shortcut (simulated on the host machine). " +
+          "Label is shown on the device display.";
         container.appendChild(hint);
 
         for (let i = 0; i < 4; i++) {
@@ -1540,12 +1545,14 @@
           header.className = "kb-col-header";
           header.innerHTML =
             '<span class="kb-gesture-label"></span>' +
-            '<span class="kb-col-name">Action</span>' +
+            '<span class="kb-col-name" style="flex:0 0 100px">Type</span>' +
+            '<span class="kb-col-name">Value</span>' +
             '<span class="kb-col-name">Label</span>';
           card.appendChild(header);
 
           for (const g of KB_GESTURES) {
             const mapping = keyMapping[g.id] || keyMapping[g.snake] || {};
+            const prefix = "kb-" + keyId + "-" + g.id;
 
             const row = document.createElement("div");
             row.className = "kb-gesture-row";
@@ -1554,26 +1561,74 @@
             lbl.className = "kb-gesture-label";
             lbl.textContent = g.label;
 
-            // Support both the action/label format and the older keys:[...] format.
-            // If only keys is present, seed action with the joined sequence so the
-            // user can see and edit what they previously had in their config.
-            const keysStr = Array.isArray(mapping.keys)
-              ? mapping.keys.join(", ")
+            // Detect current type (empty if no mapping defined)
+            const hasMapping = mapping.type || mapping.action || mapping.keybinding || Array.isArray(mapping.keys);
+            const mappingType = hasMapping
+              ? (mapping.type ||
+                (mapping.keybinding
+                  ? "global"
+                  : Array.isArray(mapping.keys)
+                    ? "global"
+                    : "action"))
               : "";
 
-            const actionIn = document.createElement("input");
-            actionIn.type = "text";
-            actionIn.id = "kb-" + keyId + "-" + g.id + "-action";
-            actionIn.value = mapping.action || keysStr;
-            actionIn.placeholder = "e.g. approve";
+            // Type selector
+            const typeSelect = document.createElement("select");
+            typeSelect.id = prefix + "-type";
+            typeSelect.style.flex = "0 0 100px";
+            typeSelect.innerHTML =
+              '<option value="">—</option>' +
+              '<option value="action">Action</option>' +
+              '<option value="keybinding">Keybind</option>' +
+              '<option value="global">Global</option>';
+            typeSelect.value = mappingType;
 
+            // Action dropdown
+            const actionSelect = document.createElement("select");
+            actionSelect.id = prefix + "-action";
+            actionSelect.innerHTML =
+              '<option value="">—</option>' +
+              KB_ACTIONS.map(
+                (a) => '<option value="' + a + '">' + a + "</option>",
+              ).join("");
+            const currentAction = mapping.action || "";
+            if (currentAction && !KB_ACTIONS.includes(currentAction)) {
+              actionSelect.innerHTML +=
+                '<option value="' +
+                currentAction +
+                '">' +
+                currentAction +
+                "</option>";
+            }
+            actionSelect.value = currentAction;
+
+            // Keybinding text input
+            const keybindingIn = document.createElement("input");
+            keybindingIn.type = "text";
+            keybindingIn.id = prefix + "-keybinding";
+            const legacyKeys = Array.isArray(mapping.keys)
+              ? mapping.keys.join(", ")
+              : "";
+            keybindingIn.value = mapping.keybinding || legacyKeys || "";
+            keybindingIn.placeholder = "e.g. ctrl+c";
+
+            // Label input
             const labelIn = document.createElement("input");
             labelIn.type = "text";
-            labelIn.id = "kb-" + keyId + "-" + g.id + "-label";
+            labelIn.id = prefix + "-label";
             labelIn.value = mapping.label || "";
             labelIn.placeholder = "e.g. Yes";
 
-            row.append(lbl, actionIn, labelIn);
+            // Show/hide based on type
+            function updateValueVisibility() {
+              const t = typeSelect.value;
+              actionSelect.style.display = t === "action" ? "" : "none";
+              keybindingIn.style.display = (t === "keybinding" || t === "global") ? "" : "none";
+            }
+            typeSelect.addEventListener("change", updateValueVisibility);
+            updateValueVisibility();
+
+            row.append(lbl, typeSelect, actionSelect, keybindingIn, labelIn);
             card.appendChild(row);
           }
 
@@ -1601,17 +1656,31 @@
           const keyId = "key" + i;
           const keyMapping = {};
           for (const g of KB_GESTURES) {
-            const actionEl = document.getElementById(
-              "kb-" + keyId + "-" + g.id + "-action",
+            const prefix = "kb-" + keyId + "-" + g.id;
+            const typeEl = document.getElementById(prefix + "-type");
+            const actionEl = document.getElementById(prefix + "-action");
+            const keybindingEl = document.getElementById(
+              prefix + "-keybinding",
             );
-            const labelEl = document.getElementById(
-              "kb-" + keyId + "-" + g.id + "-label",
-            );
-            if (!actionEl || !labelEl) continue;
-            const action = actionEl.value.trim();
+            const labelEl = document.getElementById(prefix + "-label");
+            if (!typeEl || !labelEl) continue;
+
+            const type = typeEl.value;
             const label = labelEl.value.trim();
-            if (action || label) {
-              keyMapping[g.id] = { action, label };
+
+            if (!type) continue; // empty type — no mapping
+
+            if (type === "action") {
+              const action = actionEl ? actionEl.value.trim() : "";
+              if (action || label) {
+                keyMapping[g.id] = { type: "action", action, label };
+              }
+            } else {
+              // Both "keybinding" and "global" use the keybinding text input
+              const keybinding = keybindingEl ? keybindingEl.value.trim() : "";
+              if (keybinding || label) {
+                keyMapping[g.id] = { type, keybinding, label };
+              }
             }
           }
           if (Object.keys(keyMapping).length > 0) {
