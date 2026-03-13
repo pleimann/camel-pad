@@ -139,6 +139,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     simulateKeySequence(combo)
                 }
             }
+        } else if type == "activate-app" {
+            if let appName = obj["app"] as? String {
+                activateApp(appName)
+            }
         } else if type == "exit" {
             NSApp.terminate(nil)
         }
@@ -266,6 +270,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func stopEventMonitor() {
         if let m = eventMonitor { NSEvent.removeMonitor(m); eventMonitor = nil }
+    }
+}
+
+// ─── App activation ─────────────────────────────────────────────────────────
+
+func activateApp(_ name: String) {
+    let running = NSWorkspace.shared.runningApplications
+    // Try exact localizedName match, then bundle name (last path component minus .app)
+    let app = running.first(where: { $0.localizedName == name })
+        ?? running.first(where: {
+            $0.bundleURL?.deletingPathExtension().lastPathComponent == name
+        })
+    if let app {
+        app.activate(options: .activateIgnoringOtherApps)
+    } else {
+        FileHandle.standardError.write(Data("[camel-pad] activate-app: no running app matching \"\(name)\"\n".utf8))
     }
 }
 

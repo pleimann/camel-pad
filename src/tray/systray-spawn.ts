@@ -7,7 +7,6 @@ import { homedir } from 'os';
 // Asset-embed the Go tray binaries. At compile time (bun build --compile),
 // these become embedded $bunfs/ paths. At dev time, they resolve to real files.
 import trayBinDarwin from '@/static/traybin/tray_darwin_release' with { type: 'file' };
-import trayBinWindows from '@/static/traybin/tray_windows_release.exe' with { type: 'file' };
 
 export interface MenuItem {
   title: string;
@@ -36,6 +35,7 @@ export interface SysTrayHandle {
   showPopover(url: string, width?: number, height?: number): void;
   hidePopover(): void;
   simulateKey(combo: string): void;
+  activateApp(appName: string): void;
   kill(): void;
   onExit(cb: () => void): void;
 }
@@ -44,11 +44,10 @@ function getTrayBinPath(): string {
   const cacheDir = join(homedir(), '.cache', 'camel-pad');
   mkdirSync(cacheDir, { recursive: true });
 
-  const isWindows = process.platform === 'win32';
-  const binName = isWindows ? 'tray.exe' : 'tray';
+  const binName = 'tray';
   const destPath = join(cacheDir, binName);
 
-  const srcPath = isWindows ? trayBinWindows : trayBinDarwin;
+  const srcPath = trayBinDarwin;
   const srcBuf = readFileSync(srcPath);
 
   // Only write if missing or content changed
@@ -60,7 +59,7 @@ function getTrayBinPath(): string {
 
   if (needsWrite) {
     writeFileSync(destPath, srcBuf);
-    if (!isWindows) chmodSync(destPath, 0o755);
+    chmodSync(destPath, 0o755);
   }
 
   return destPath;
@@ -157,6 +156,9 @@ export function spawnSysTray(
           },
           simulateKey(combo: string) {
             proc.stdin.write(JSON.stringify({ type: 'simulate-key', combo }) + '\n');
+          },
+          activateApp(appName: string) {
+            proc.stdin.write(JSON.stringify({ type: 'activate-app', app: appName }) + '\n');
           },
           kill() {
             proc.stdin.write(JSON.stringify({ type: 'exit' }) + '\n');

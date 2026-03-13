@@ -59,6 +59,7 @@ function extractLabelsForDisplay(config: any, handedness: 'left' | 'right'): str
 
 export interface BridgeOptions {
   simulateKey?: (combo: string) => void;
+  activateApp?: (appName: string) => void;
 }
 
 export async function startBridge(configPath: string, options?: BridgeOptions): Promise<BridgeHandle> {
@@ -159,6 +160,13 @@ export async function startBridge(configPath: string, options?: BridgeOptions): 
       pushLog('out', 'global', actionMapping.keybinding);
       console.log(`Global keybinding: ${actionMapping.keybinding}`);
       options?.simulateKey?.(actionMapping.keybinding);
+      return;
+    }
+
+    if (actionMapping.type === 'focus-app') {
+      pushLog('out', 'focus-app', actionMapping.app);
+      console.log(`Focus app: ${actionMapping.app}`);
+      options?.activateApp?.(actionMapping.app);
       return;
     }
 

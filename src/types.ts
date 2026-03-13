@@ -27,7 +27,7 @@ export interface KeyMapping {
   longPress?: ActionMapping;
 }
 
-export type ActionMapping = ActionAction | KeybindingAction | GlobalAction;
+export type ActionMapping = ActionAction | KeybindingAction | GlobalAction | FocusAppAction;
 
 export interface ActionAction {
   type: 'action';
@@ -44,6 +44,12 @@ export interface KeybindingAction {
 export interface GlobalAction {
   type: 'global';
   keybinding: string;
+  label: string;
+}
+
+export interface FocusAppAction {
+  type: 'focus-app';
+  app: string;
   label: string;
 }
 

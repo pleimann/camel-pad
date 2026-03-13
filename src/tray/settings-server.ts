@@ -1,5 +1,7 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync } from 'fs';
 import { stringify } from 'yaml';
+import { join } from 'path';
+import { homedir } from 'os';
 import { loadConfig } from '@/config/loader.js';
 import { listPorts } from '@/serial/discovery.js';
 import type { Config } from '@/types.js';
@@ -129,6 +131,15 @@ export async function startSettingsServer(
         return Response.json({ ok }, { headers: corsHeaders });
       }
 
+      if (url.pathname === '/api/apps') {
+        try {
+          const apps = listApps();
+          return Response.json(apps);
+        } catch (err: any) {
+          return new Response(err.message, { status: 500 });
+        }
+      }
+
       if (url.pathname === '/api/close') {
         setTimeout(() => server?.stop(), 200);
         return new Response('ok');
@@ -195,4 +206,27 @@ function buildYaml(config: Partial<Config>): string {
   }
 
   return stringify(out);
+}
+
+/**
+ * Lists installed macOS applications by scanning /Applications and ~/Applications.
+ * Returns sorted app names (e.g. "Visual Studio Code", "Safari", "iTerm").
+ */
+function listApps(): string[] {
+  const dirs = ['/Applications', join(homedir(), 'Applications')];
+  const names = new Set<string>();
+
+  for (const dir of dirs) {
+    try {
+      for (const entry of readdirSync(dir)) {
+        if (entry.endsWith('.app')) {
+          names.add(entry.slice(0, -4));
+        }
+      }
+    } catch {
+      // Directory may not exist
+    }
+  }
+
+  return [...names].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 }

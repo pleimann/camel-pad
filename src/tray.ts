@@ -31,6 +31,7 @@ async function tryStartBridge() {
   try {
     const handle = await startBridge(configPath, {
       simulateKey: (combo) => tray?.simulateKey(combo),
+      activateApp: (appName) => tray?.activateApp(appName),
     });
     handle.onStatusChange((status) => {
       tray?.updateItem(ITEM_STATUS, {

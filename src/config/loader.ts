@@ -46,6 +46,9 @@ function normalizeActionMapping(raw: any): ActionMapping | undefined {
   if (raw.type === 'global') {
     return { type: 'global', keybinding: raw.keybinding || '', label: raw.label || '' };
   }
+  if (raw.type === 'focus-app') {
+    return { type: 'focus-app', app: raw.app || '', label: raw.label || '' };
+  }
 
   // Legacy keys: ["ctrl+c"] format
   if (Array.isArray(raw.keys)) {

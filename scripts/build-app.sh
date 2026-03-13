@@ -11,39 +11,38 @@ APP_DIR="${DIST_DIR}/${APP_NAME}.app"
 echo "Building camel-pad ${VERSION} macOS app bundle..."
 mkdir -p "${DIST_DIR}"
 
-# 1. Compile for both architectures
+# 0. Build Swift tray binary
+TRAY_SWIFT_DIR="tray_swift"
+TRAY_BIN_DIR="src/static/traybin"
+TRAY_BIN_DEST="${TRAY_BIN_DIR}/tray_darwin_release"
+
+echo "  Building Swift tray binary..."
+mkdir -p "${TRAY_BIN_DIR}"
+cd "${TRAY_SWIFT_DIR}"
+swift build -c release
+cd ..
+cp "${TRAY_SWIFT_DIR}/.build/release/tray" "${TRAY_BIN_DEST}"
+chmod +x "${TRAY_BIN_DEST}"
+
+# 1. Compile bun binary
 echo "  Compiling arm64..."
 bun build --compile \
   --target bun-darwin-arm64 \
   --minify \
-  --outfile "${DIST_DIR}/camel-pad-tray-arm64" \
+  --outfile "${DIST_DIR}/camel-pad-tray" \
   src/tray.ts
 
-echo "  Compiling x64..."
-bun build --compile \
-  --target bun-darwin-x64 \
-  --minify \
-  --outfile "${DIST_DIR}/camel-pad-tray-x64" \
-  src/tray.ts
-
-# 2. Create universal binary
-echo "  Creating universal binary..."
-lipo -create \
-  "${DIST_DIR}/camel-pad-tray-arm64" \
-  "${DIST_DIR}/camel-pad-tray-x64" \
-  -output "${DIST_DIR}/camel-pad-tray"
-
-# 3. Create .app bundle structure
+# 2. Create .app bundle structure
 echo "  Creating .app bundle..."
 rm -rf "${APP_DIR}"
 mkdir -p "${APP_DIR}/Contents/MacOS"
 mkdir -p "${APP_DIR}/Contents/Resources"
 
-# 4. Copy the binary
+# 3. Copy the binary
 cp "${DIST_DIR}/camel-pad-tray" "${APP_DIR}/Contents/MacOS/${APP_NAME}"
 chmod +x "${APP_DIR}/Contents/MacOS/${APP_NAME}"
 
-# 5. Write Info.plist
+# 4. Write Info.plist
 #    LSUIElement=true: no Dock icon, no app switcher entry (agent app)
 cat > "${APP_DIR}/Contents/Info.plist" << PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -80,9 +79,9 @@ cat > "${APP_DIR}/Contents/Info.plist" << PLIST
 </plist>
 PLIST
 
-# 6. Build icon assets
+# 5. Build icon assets
 if [ -d "assets/CamelPad.icon" ]; then
-  # 6a. Compile Assets.car for macOS 26 Tahoe Liquid Glass rendering
+  # 5a. Compile Assets.car for macOS 26 Tahoe Liquid Glass rendering
   if xcrun --find actool &>/dev/null; then
     echo "  Compiling Assets.car (Liquid Glass)..."
     ACTOOL=$(xcrun -f actool)
@@ -105,7 +104,7 @@ if [ -d "assets/CamelPad.icon" ]; then
     echo "  Warning: actool not found (Xcode required). Skipping Assets.car."
   fi
 
-  # 6b. Generate legacy .icns for macOS 13–15
+  # 5b. Generate legacy .icns for macOS 13–15
   echo "  Generating legacy CamelPad.icns..."
   swift scripts/export-icon.swift
 fi

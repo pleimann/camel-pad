@@ -1404,6 +1404,21 @@
         else stopMonitorPolling();
       }
 
+      // ── Keyboard shortcuts ───────────────────────────────────────────
+      document.addEventListener("keydown", (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+          e.preventDefault();
+          const activeTab = document.querySelector(".tab-btn.active")?.dataset.tab;
+          if (activeTab === "settings") saveConfig();
+          else if (activeTab === "keys") saveKeybindings();
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+          const el = document.activeElement;
+          if (el?.id === "ctrl-status") { e.preventDefault(); sendStatusText(); }
+          else if (el?.id === "ctrl-text") { e.preventDefault(); sendDisplayText(); }
+        }
+      });
+
       // ── Monitor view ─────────────────────────────────────────────────
 
       let monitorPollInterval = null;
@@ -1515,6 +1530,18 @@
 
       const KB_ACTIONS = ["approve", "deny", "reset"];
 
+      let cachedAppList = null;
+      async function loadAppList() {
+        if (cachedAppList) return cachedAppList;
+        try {
+          const res = await fetch("/api/apps");
+          cachedAppList = await res.json();
+        } catch {
+          cachedAppList = [];
+        }
+        return cachedAppList;
+      }
+
       function renderKeybindings(keys) {
         const container = document.getElementById("view-keys");
         container.innerHTML = "";
@@ -1525,7 +1552,8 @@
         hint.textContent =
           "Map each button gesture to an action (sent to Claude Code), " +
           "a keybinding (sent to Claude Code as a key combo), " +
-          "or a global shortcut (simulated on the host machine). " +
+          "a global shortcut (simulated on the host machine), " +
+          "or focus app (brings a named application to the front). " +
           "Label is shown on the device display.";
         container.appendChild(hint);
 
@@ -1562,7 +1590,7 @@
             lbl.textContent = g.label;
 
             // Detect current type (empty if no mapping defined)
-            const hasMapping = mapping.type || mapping.action || mapping.keybinding || Array.isArray(mapping.keys);
+            const hasMapping = mapping.type || mapping.action || mapping.keybinding || mapping.app || Array.isArray(mapping.keys);
             const mappingType = hasMapping
               ? (mapping.type ||
                 (mapping.keybinding
@@ -1580,7 +1608,8 @@
               '<option value="">—</option>' +
               '<option value="action">Action</option>' +
               '<option value="keybinding">Keybind</option>' +
-              '<option value="global">Global</option>';
+              '<option value="global">Global</option>' +
+              '<option value="focus-app">Focus App</option>';
             typeSelect.value = mappingType;
 
             // Action dropdown
@@ -1612,6 +1641,15 @@
             keybindingIn.value = mapping.keybinding || legacyKeys || "";
             keybindingIn.placeholder = "e.g. ctrl+c";
 
+            // App name selector (for focus-app type)
+            const appNameIn = document.createElement("select");
+            appNameIn.id = prefix + "-app";
+            appNameIn.innerHTML = '<option value="">Select app…</option>';
+            const currentApp = mapping.app || "";
+            if (currentApp) {
+              appNameIn.innerHTML += '<option value="' + currentApp + '" selected>' + currentApp + '</option>';
+            }
+
             // Label input
             const labelIn = document.createElement("input");
             labelIn.type = "text";
@@ -1624,11 +1662,12 @@
               const t = typeSelect.value;
               actionSelect.style.display = t === "action" ? "" : "none";
               keybindingIn.style.display = (t === "keybinding" || t === "global") ? "" : "none";
+              appNameIn.style.display = t === "focus-app" ? "" : "none";
             }
             typeSelect.addEventListener("change", updateValueVisibility);
             updateValueVisibility();
 
-            row.append(lbl, typeSelect, actionSelect, keybindingIn, labelIn);
+            row.append(lbl, typeSelect, actionSelect, keybindingIn, appNameIn, labelIn);
             card.appendChild(row);
           }
 
@@ -1674,6 +1713,12 @@
               const action = actionEl ? actionEl.value.trim() : "";
               if (action || label) {
                 keyMapping[g.id] = { type: "action", action, label };
+              }
+            } else if (type === "focus-app") {
+              const appEl = document.getElementById(prefix + "-app");
+              const app = appEl ? appEl.value.trim() : "";
+              if (app || label) {
+                keyMapping[g.id] = { type: "focus-app", app, label };
               }
             } else {
               // Both "keybinding" and "global" use the keybinding text input
@@ -1752,6 +1797,24 @@
           showStatus("Failed to populate settings form: " + e.message, "error");
         }
         renderKeybindings(config.keys ?? {});
+        populateAppSelectors();
+      }
+
+      async function populateAppSelectors() {
+        const apps = await loadAppList();
+        document.querySelectorAll('select[id$="-app"]').forEach((sel) => {
+          const current = sel.value;
+          const placeholder = '<option value="">Select app…</option>';
+          const options = apps.map(
+            (a) => '<option value="' + a + '"' + (a === current ? ' selected' : '') + '>' + a + '</option>'
+          ).join("");
+          sel.innerHTML = placeholder + options;
+          // Restore value if it was a custom app not in the list
+          if (current && !apps.includes(current)) {
+            sel.innerHTML += '<option value="' + current + '" selected>' + current + '</option>';
+          }
+          sel.value = current;
+        });
       }
 
       function populateForm(config) {

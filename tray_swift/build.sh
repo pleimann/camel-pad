@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-DEST="$REPO_ROOT/assets/traybin/tray_darwin_release"
+DEST="$REPO_ROOT/src/static/traybin/tray_darwin_release"
 
 echo "Building Swift tray binary..."
 
