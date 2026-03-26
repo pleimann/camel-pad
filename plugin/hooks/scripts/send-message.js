@@ -5,75 +5,46 @@
  * Usage: node send-message.js "Your message here"
  */
 
-const WebSocket = require('ws');
-const fs = require('fs');
-const path = require('path');
-const { randomUUID } = require('crypto');
-const yaml = require('yaml');
-const logger = require('./logger');
-
-const { getConfigPath } = require('./config-path');
-
-const message = process.argv.slice(2).join(' ');
-
-if (!message) {
-  console.log(JSON.stringify({
-    success: false,
-    error: 'No message provided'
-  }));
-  process.exit(1);
-}
-
-const configPath = getConfigPath();
+import WebSocket from 'ws';
+import fs from 'fs';
+import { randomUUID } from 'crypto';
+import YAML from 'yaml';
+import logger from './logger.js';
+import { getConfigPath } from './config-path.js';
 
 function parseConfig(configPath) {
-  if (!fs.existsSync(configPath)) {
-    return null;
-  }
-
+  if (!fs.existsSync(configPath)) return null;
   try {
     const content = fs.readFileSync(configPath, 'utf8');
-    const config = yaml.parse(content);
-
-    if (!config || !config.server) {
-      return null;
-    }
-
-    // Extract settings needed for WebSocket connection
-    const endpoint = `ws://${config.server.host || 'localhost'}:${config.server.port || 52914}`;
-    const timeout = config.defaults?.timeoutMs ? Math.floor(config.defaults.timeoutMs / 1000) : 30;
-
-    return { endpoint, timeout };
+    const config = YAML.parse(content);
+    if (!config?.server) return null;
+    return {
+      endpoint: `ws://${config.server.host || 'localhost'}:${config.server.port || 52914}`,
+      timeout: config.defaults?.timeoutMs ? Math.floor(config.defaults.timeoutMs / 1000) : 30,
+    };
   } catch (err) {
     logger.error('Error parsing config:', err.message);
     return null;
   }
 }
 
+const message = process.argv.slice(2).join(' ');
+
+if (!message) {
+  console.log(JSON.stringify({ success: false, error: 'No message provided' }));
+  process.exit(1);
+}
+
 async function main() {
-  const config = parseConfig(configPath);
+  const config = parseConfig(getConfigPath());
 
   if (!config) {
-    console.log(JSON.stringify({
-      success: false,
-      error: 'No configuration found. Run /camel-pad:configure first.'
-    }));
+    console.log(JSON.stringify({ success: false, error: 'No configuration found. Run /camel-pad:configure first.' }));
     process.exit(1);
   }
 
-  if (!config.endpoint) {
-    console.log(JSON.stringify({
-      success: false,
-      error: 'No endpoint configured'
-    }));
-    process.exit(1);
-  }
-
-  if (!config.timeout) {
-    console.log(JSON.stringify({
-      success: false,
-      error: 'No timeout configured'
-    }));
+  if (!config.endpoint || !config.timeout) {
+    console.log(JSON.stringify({ success: false, error: 'Incomplete configuration' }));
     process.exit(1);
   }
 
@@ -117,18 +88,11 @@ async function main() {
 
     console.log(JSON.stringify({
       success: true,
-      message: message,
-      response: {
-        action: result.action,
-        label: result.label
-      }
+      message,
+      response: { action: result.action, label: result.label },
     }));
-
   } catch (err) {
-    console.log(JSON.stringify({
-      success: false,
-      error: err.message
-    }));
+    console.log(JSON.stringify({ success: false, error: err.message }));
     process.exit(1);
   }
 }

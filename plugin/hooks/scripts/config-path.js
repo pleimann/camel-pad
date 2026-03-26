@@ -5,11 +5,11 @@
  * Matches the logic in src/tray/config-store.ts
  */
 
-const os = require('os');
-const path = require('path');
-const fs = require('fs');
+import os from 'os';
+import path from 'path';
+import fs from 'fs';
 
-function getConfigPath() {
+export function getConfigPath() {
   let base;
 
   if (process.platform === 'darwin') {
@@ -26,9 +26,7 @@ function getConfigPath() {
   return path.join(base, 'config.yaml');
 }
 
-module.exports = { getConfigPath };
-
 // If run directly, print the path
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   console.log(getConfigPath());
 }

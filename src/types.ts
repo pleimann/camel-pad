@@ -79,6 +79,73 @@ export interface ErrorMessage {
 
 export type OutgoingMessage = ResponseMessage | ErrorMessage;
 
+// Channel ↔ Bridge WebSocket message types
+
+/** Channel client registers with bridge on connect */
+export interface RegisterMessage {
+  type: 'register';
+  role: 'channel';
+}
+
+/** Bridge confirms channel registration */
+export interface RegisteredMessage {
+  type: 'registered';
+  status: 'ok';
+}
+
+/** Bridge → channel: unsolicited button press (no pending notification) */
+export interface ButtonEventMessage {
+  type: 'button_event';
+  buttonId: string;
+  gesture: GestureType;
+  label: string;
+  timestamp: number;
+}
+
+/** Channel → bridge: display a permission prompt on device */
+export interface PermissionRequestMessage {
+  type: 'permission_request';
+  id: string;
+  tool: string;
+  description: string;
+  input_preview: string;
+}
+
+/** Bridge → channel: button press as permission verdict */
+export interface PermissionVerdictMessage {
+  type: 'permission_verdict';
+  id: string;
+  verdict: 'allow' | 'deny';
+}
+
+/** Channel → bridge: display command (text, status, clear, leds, labels) */
+export interface DisplayCommandMessage {
+  type: 'display_command';
+  id: string;
+  command: 'text' | 'status' | 'clear' | 'leds' | 'labels';
+  payload: any;
+}
+
+/** Bridge → channel: display command acknowledgement */
+export interface DisplayAckMessage {
+  type: 'display_ack';
+  id: string;
+  success: boolean;
+}
+
+/** All messages the bridge can receive from a channel client */
+export type ChannelInboundMessage =
+  | RegisterMessage
+  | PermissionRequestMessage
+  | DisplayCommandMessage;
+
+/** All messages the bridge can send to a channel client */
+export type ChannelOutboundMessage =
+  | RegisteredMessage
+  | ButtonEventMessage
+  | PermissionVerdictMessage
+  | DisplayAckMessage;
+
 // Serial protocol constants (matches firmware config.h)
 export const FRAME_START_BYTE = 0xAA;
 export const MAX_MSG_LEN = 512;

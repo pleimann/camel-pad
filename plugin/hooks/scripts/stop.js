@@ -14,17 +14,18 @@
  *   - The device times out
  */
 
-const WebSocket = require('ws');
-const fs = require('fs');
-const { randomUUID } = require('crypto');
-const yaml = require('yaml');
-const logger = require('./logger');
+import WebSocket from 'ws';
+import fs from 'fs';
+import { randomUUID } from 'crypto';
+import YAML from 'yaml';
+import logger from './logger.js';
+import { getConfigPath } from './config-path.js';
 
 function parseConfig(configPath) {
   if (!fs.existsSync(configPath)) return null;
   try {
     const content = fs.readFileSync(configPath, 'utf8');
-    const config = yaml.parse(content);
+    const config = YAML.parse(content);
     if (!config?.server) return null;
     return {
       endpoint: `ws://${config.server.host || 'localhost'}:${config.server.port || 52914}`,
@@ -41,7 +42,6 @@ function parseConfig(configPath) {
  */
 function extractLastQuestion(text) {
   if (!text) return null;
-  // Split on sentence-ending punctuation, keep trailing content
   const sentences = text.split(/(?<=[.!?])\s+/);
   for (let i = sentences.length - 1; i >= 0; i--) {
     const s = sentences[i].trim();
@@ -50,20 +50,7 @@ function extractLastQuestion(text) {
   return null;
 }
 
-let input = '';
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => input += chunk);
-process.stdin.on('end', async () => {
-  try {
-    await main(JSON.parse(input));
-  } catch (err) {
-    logger.error(err.message);
-    console.log(JSON.stringify({ continue: true }));
-  }
-});
-
 async function main(hookInput) {
-  // Prevent infinite loops when Claude is already continuing from a stop hook
   if (hookInput.stop_hook_active) {
     console.log(JSON.stringify({ continue: true }));
     return;
@@ -75,7 +62,6 @@ async function main(hookInput) {
     return;
   }
 
-  const { getConfigPath } = require('./config-path');
   const config = parseConfig(getConfigPath());
   if (!config) {
     logger.log('No config found, falling back to terminal');
@@ -104,12 +90,7 @@ async function main(hookInput) {
     }
 
     ws.on('open', () => {
-      const msg = {
-        type: 'notification',
-        id: messageId,
-        text: question,
-        category: 'question',
-      };
+      const msg = { type: 'notification', id: messageId, text: question, category: 'question' };
       logger.send(msg);
       ws.send(JSON.stringify(msg));
     });
@@ -149,3 +130,15 @@ async function main(hookInput) {
   logger.log(reason);
   console.log(JSON.stringify({ decision: 'block', reason }));
 }
+
+let input = '';
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', chunk => input += chunk);
+process.stdin.on('end', async () => {
+  try {
+    await main(JSON.parse(input));
+  } catch (err) {
+    logger.error(err.message);
+    console.log(JSON.stringify({ continue: true }));
+  }
+});

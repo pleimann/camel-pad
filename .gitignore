@@ -12,3 +12,4 @@ tray_swift/.build/
 tray_swift/.swiftpm/
 firmware/fonts/DejaVuSans.ttf
 firmware/src/fonts/lv_font*.c
+.collaborator

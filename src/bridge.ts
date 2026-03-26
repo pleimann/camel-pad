@@ -173,6 +173,9 @@ export async function startBridge(configPath: string, options?: BridgeOptions): 
     // type === 'action' or 'keybinding' — delegate to notification server
     const handled = notificationServer.handleGesture(buttonId, gesture);
     if (!handled && !notificationServer.hasPending()) {
+      // No pending notifications — push button event to channel client if connected
+      const label = actionMapping.label || '';
+      notificationServer.pushButtonEvent(buttonId, gesture, label);
       console.log('No pending notifications');
     }
   });
@@ -183,6 +186,35 @@ export async function startBridge(configPath: string, options?: BridgeOptions): 
     pushLog('out', 'display', message.text.length > 60 ? message.text.slice(0, 60) + '…' : message.text);
     console.log(`Notification: ${message.text}`);
     serialDevice.sendText(message.text);
+  });
+
+  // Channel display commands → Serial device
+  notificationServer.on('displayText', (text: string) => {
+    pushLog('out', 'channel-display', text.length > 60 ? text.slice(0, 60) + '…' : text);
+    console.log(`Channel display: ${text}`);
+    serialDevice.sendText(text);
+  });
+
+  notificationServer.on('displayStatus', (text: string) => {
+    pushLog('out', 'channel-status', text.length > 60 ? text.slice(0, 60) + '…' : text);
+    serialDevice.sendStatus(text);
+  });
+
+  notificationServer.on('displayLeds', (leds: Array<{ index: number; r: number; g: number; b: number }>) => {
+    const remapped = leds.map(led => ({ ...led, index: 3 - remapButtonIndex(led.index, handedness) }));
+    pushLog('out', 'channel-leds', leds.map(l => `[${l.index}] #${[l.r, l.g, l.b].map(v => v.toString(16).padStart(2, '0')).join('')}`).join(' '));
+    serialDevice.sendLeds(remapped);
+  });
+
+  notificationServer.on('displayLabels', (labels: string[]) => {
+    // Labels are in logical key order, remap to physical
+    const physicalLabels: string[] = [];
+    for (let physicalPos = 0; physicalPos <= 3; physicalPos++) {
+      const logicalKey = remapButtonIndex(physicalPos, handedness);
+      physicalLabels.push(labels[logicalKey] || '');
+    }
+    pushLog('out', 'channel-labels', physicalLabels.join(' | '));
+    serialDevice.sendLabels(physicalLabels);
   });
 
   // Clear display when all notifications are handled, then restore labels

@@ -11,17 +11,18 @@
  * question appears in the terminal as normal.
  */
 
-const WebSocket = require('ws');
-const fs = require('fs');
-const { randomUUID } = require('crypto');
-const yaml = require('yaml');
-const logger = require('./logger');
+import WebSocket from 'ws';
+import fs from 'fs';
+import { randomUUID } from 'crypto';
+import YAML from 'yaml';
+import logger from './logger.js';
+import { getConfigPath } from './config-path.js';
 
 function parseConfig(configPath) {
   if (!fs.existsSync(configPath)) return null;
   try {
     const content = fs.readFileSync(configPath, 'utf8');
-    const config = yaml.parse(content);
+    const config = YAML.parse(content);
     if (!config?.server) return null;
     return {
       endpoint: `ws://${config.server.host || 'localhost'}:${config.server.port || 52914}`,
@@ -32,21 +33,7 @@ function parseConfig(configPath) {
   }
 }
 
-let input = '';
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => input += chunk);
-process.stdin.on('end', async () => {
-  try {
-    await main(JSON.parse(input));
-  } catch (err) {
-    logger.error(err.message);
-    // On any error, let the terminal handle it
-    console.log(JSON.stringify({ continue: true }));
-  }
-});
-
 async function main(hookInput) {
-  const { getConfigPath } = require('./config-path');
   const config = parseConfig(getConfigPath());
 
   if (!config) {
@@ -85,8 +72,6 @@ async function main(hookInput) {
     }
 
     ws.on('open', () => {
-      // Send question text and options separately — the bridge handles
-      // selection display with highlight and navigation labels.
       const optionLabels = options.map(o => o.label);
       const msg = {
         type: 'notification',
@@ -125,19 +110,16 @@ async function main(hookInput) {
   });
 
   if (!result) {
-    // Bridge unavailable or timed out — let the terminal show the question
     console.log(JSON.stringify({ continue: true }));
     return;
   }
 
-  // Cancel → fall back to terminal
   if (result.action === 'cancel') {
     logger.log('User cancelled via camel-pad, falling back to terminal');
     console.log(JSON.stringify({ continue: true }));
     return;
   }
 
-  // Build a descriptive answer Claude can interpret as the user's response
   let selectedLabel;
   if (result.selectedIndex !== undefined && options.length > 0) {
     selectedLabel = options[result.selectedIndex]?.label || result.label || String(result.selectedIndex + 1);
@@ -146,8 +128,17 @@ async function main(hookInput) {
   }
   const reason = `User answered via camel-pad: ${selectedLabel}`;
   logger.log(reason);
-  console.log(JSON.stringify({
-    decision: 'block',
-    reason,
-  }));
+  console.log(JSON.stringify({ decision: 'block', reason }));
 }
+
+let input = '';
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', chunk => input += chunk);
+process.stdin.on('end', async () => {
+  try {
+    await main(JSON.parse(input));
+  } catch (err) {
+    logger.error(err.message);
+    console.log(JSON.stringify({ continue: true }));
+  }
+});

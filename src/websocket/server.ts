@@ -7,6 +7,13 @@ import type {
   PendingNotification,
   Config,
   GestureType,
+  RegisterMessage,
+  RegisteredMessage,
+  ButtonEventMessage,
+  PermissionRequestMessage,
+  PermissionVerdictMessage,
+  DisplayCommandMessage,
+  DisplayAckMessage,
 } from '../types.js';
 
 export class NotificationServer extends EventEmitter {
@@ -14,6 +21,9 @@ export class NotificationServer extends EventEmitter {
   private config: Config;
   private pending: Map<string, PendingNotification> = new Map();
   private notificationQueue: string[] = []; // Order of pending notifications
+  private channelClient: WebSocket | null = null;
+  // Pending permission requests: id → resolve callback for verdict
+  private pendingPermissions: Map<string, (verdict: 'allow' | 'deny') => void> = new Map();
 
   constructor(config: Config) {
     super();
@@ -42,23 +52,188 @@ export class NotificationServer extends EventEmitter {
 
   private handleConnection(ws: WebSocket): void {
     console.log('Client connected');
+    let isChannel = false;
 
     ws.on('message', (data) => {
       try {
-        const message = JSON.parse(data.toString()) as NotificationMessage;
-        this.handleMessage(ws, message);
+        const message = JSON.parse(data.toString());
+
+        // Check for channel registration handshake
+        if (message.type === 'register' && message.role === 'channel') {
+          this.registerChannelClient(ws);
+          isChannel = true;
+          return;
+        }
+
+        // Route to channel or legacy handler
+        if (isChannel) {
+          this.handleChannelMessage(ws, message);
+        } else {
+          this.handleMessage(ws, message as NotificationMessage);
+        }
       } catch (err) {
         console.error('Invalid message:', err);
       }
     });
 
     ws.on('close', () => {
-      console.log('Client disconnected');
+      if (isChannel && this.channelClient === ws) {
+        console.log('Channel client disconnected');
+        this.channelClient = null;
+        // Clean up any pending permission requests
+        for (const [id, resolve] of this.pendingPermissions) {
+          resolve('deny'); // Default deny on disconnect
+        }
+        this.pendingPermissions.clear();
+      } else {
+        console.log('Client disconnected');
+      }
     });
 
     ws.on('error', (err) => {
       console.error('WebSocket client error:', err);
     });
+  }
+
+  // --- Channel client support ---
+
+  private registerChannelClient(ws: WebSocket): void {
+    if (this.channelClient && this.channelClient.readyState === WebSocket.OPEN) {
+      console.log('Replacing existing channel client');
+      // Clean up old channel client's pending permissions
+      for (const [id, resolve] of this.pendingPermissions) {
+        resolve('deny');
+      }
+      this.pendingPermissions.clear();
+    }
+    this.channelClient = ws;
+    const ack: RegisteredMessage = { type: 'registered', status: 'ok' };
+    ws.send(JSON.stringify(ack));
+    console.log('Channel client registered');
+  }
+
+  private handleChannelMessage(ws: WebSocket, message: any): void {
+    switch (message.type) {
+      case 'permission_request':
+        this.handlePermissionRequest(ws, message as PermissionRequestMessage);
+        break;
+      case 'display_command':
+        this.handleDisplayCommand(ws, message as DisplayCommandMessage);
+        break;
+      default:
+        console.warn('Unknown channel message type:', message.type);
+    }
+  }
+
+  private handlePermissionRequest(ws: WebSocket, message: PermissionRequestMessage): void {
+    const { id, tool, description, input_preview } = message;
+    const timeoutMs = this.config.defaults.timeoutMs;
+
+    // Display the permission prompt on the device
+    const promptText = `${tool}: ${description}`;
+
+    // Create a pending notification with two options: Allow / Deny
+    const pending: PendingNotification = {
+      id,
+      text: promptText,
+      category: 'permission',
+      options: ['Allow', 'Deny'],
+      selectedIndex: 0,
+      timeoutMs,
+      timeoutHandle: setTimeout(() => {
+        this.pending.delete(id);
+        this.notificationQueue = this.notificationQueue.filter(nid => nid !== id);
+        this.pendingPermissions.delete(id);
+        // Send deny verdict on timeout
+        const verdict: PermissionVerdictMessage = { type: 'permission_verdict', id, verdict: 'deny' };
+        try { ws.send(JSON.stringify(verdict)); } catch {}
+        this.emit('labelsRestore');
+        this.showNextOrClear();
+      }, timeoutMs),
+      resolve: (response) => {
+        // Map the response to a permission verdict
+        const isAllow = response.action === 'select' && response.selectedIndex === 0;
+        const verdict: PermissionVerdictMessage = {
+          type: 'permission_verdict',
+          id,
+          verdict: isAllow ? 'allow' : 'deny',
+        };
+        try {
+          console.log(`Permission verdict for ${id}: ${verdict.verdict}`);
+          ws.send(JSON.stringify(verdict));
+        } catch (err) {
+          console.error(`Failed to send permission verdict for ${id}:`, err);
+        }
+      },
+      reject: (error) => {
+        // Timeout or error → deny
+        const verdict: PermissionVerdictMessage = { type: 'permission_verdict', id, verdict: 'deny' };
+        try { ws.send(JSON.stringify(verdict)); } catch {}
+      },
+    };
+
+    this.pending.set(id, pending);
+    this.notificationQueue.push(id);
+
+    // Auto-dismiss leading plain notifications
+    this.autoDismissLeadingPlain(id);
+    this.emitSelectionDisplay(pending);
+    this.emit('labelsUpdate', ['\u25BC', '\u25B2', '\u2713', '\u2717']);
+  }
+
+  private handleDisplayCommand(ws: WebSocket, message: DisplayCommandMessage): void {
+    const { id, command, payload } = message;
+    let success = true;
+
+    switch (command) {
+      case 'text':
+        this.emit('displayText', payload.text);
+        break;
+      case 'status':
+        this.emit('displayStatus', payload.text);
+        break;
+      case 'clear':
+        this.emit('clear');
+        break;
+      case 'leds':
+        this.emit('displayLeds', payload.leds);
+        break;
+      case 'labels':
+        this.emit('displayLabels', payload.labels);
+        break;
+      default:
+        success = false;
+    }
+
+    const ack: DisplayAckMessage = { type: 'display_ack', id, success };
+    try {
+      ws.send(JSON.stringify(ack));
+    } catch (err) {
+      console.error(`Failed to send display ack for ${id}:`, err);
+    }
+  }
+
+  /** Push a button event to the channel client (when no notification was pending) */
+  pushButtonEvent(buttonId: string, gesture: GestureType, label: string): void {
+    if (!this.channelClient || this.channelClient.readyState !== WebSocket.OPEN) return;
+
+    const event: ButtonEventMessage = {
+      type: 'button_event',
+      buttonId,
+      gesture,
+      label,
+      timestamp: Date.now(),
+    };
+    try {
+      this.channelClient.send(JSON.stringify(event));
+    } catch (err) {
+      console.error('Failed to push button event to channel:', err);
+    }
+  }
+
+  /** Check if a channel client is connected */
+  hasChannelClient(): boolean {
+    return this.channelClient !== null && this.channelClient.readyState === WebSocket.OPEN;
   }
 
   private handleMessage(ws: WebSocket, message: NotificationMessage): void {
@@ -372,6 +547,13 @@ export class NotificationServer extends EventEmitter {
     }
     this.pending.clear();
     this.notificationQueue = [];
+
+    // Clean up channel state
+    this.channelClient = null;
+    for (const [id, resolve] of this.pendingPermissions) {
+      resolve('deny');
+    }
+    this.pendingPermissions.clear();
 
     if (this.wss) {
       this.wss.close();
