@@ -34,6 +34,10 @@ function parseConfig(configPath) {
 }
 
 async function main(hookInput) {
+  // Log the full input so we can diagnose format issues
+  logger.log('hookInput keys:', Object.keys(hookInput).join(', '));
+  logger.log('hookInput.tool_input:', JSON.stringify(hookInput.tool_input, null, 2)?.slice(0, 500));
+
   const config = parseConfig(getConfigPath());
 
   if (!config) {
@@ -42,15 +46,21 @@ async function main(hookInput) {
     return;
   }
 
+  // Try multiple paths to extract the question — the hook input format may vary
   const firstQuestion = hookInput.tool_input?.questions?.[0];
-  if (!firstQuestion?.question) {
-    logger.log('No question found in tool_input.questions[0], falling back to terminal');
+  const question = firstQuestion?.question
+    || hookInput.tool_input?.question   // alternate flat format
+    || hookInput.tool_input?.text       // alternate field name
+    || null;
+
+  if (!question) {
+    logger.log('No question found in hookInput, falling back to terminal');
+    logger.log('tool_input:', JSON.stringify(hookInput.tool_input)?.slice(0, 300));
     console.log(JSON.stringify({ continue: true }));
     return;
   }
 
-  const question = firstQuestion.question;
-  const options = firstQuestion.options || [];
+  const options = firstQuestion?.options || hookInput.tool_input?.options || [];
   logger.log('Sending question to device:', question.slice(0, 80));
 
   const messageId = randomUUID();

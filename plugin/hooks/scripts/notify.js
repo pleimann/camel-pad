@@ -31,6 +31,8 @@ function parseConfig(configPath) {
 }
 
 async function main(hookInput) {
+  logger.log('notification category:', hookInput.notification_category, 'text:', (hookInput.notification_text || '').slice(0, 80));
+
   const config = parseConfig(getConfigPath());
   if (!config) {
     console.log(JSON.stringify({ continue: true, suppressOutput: true }));
@@ -45,9 +47,13 @@ async function main(hookInput) {
   const notificationText = hookInput.notification_text || hookInput.message || '';
   const notificationCategory = hookInput.notification_category || hookInput.category || 'unknown';
 
-  // AskUserQuestion fires a 'permission_prompt' notification, but it's already
-  // handled by the PreToolUse hook. Skip it here to avoid a duplicate.
-  if (notificationCategory === 'permission_prompt') {
+  // Skip notifications that are handled by more specific hooks:
+  // - permission_prompt / tool_use: handled by PreToolUse hook (ask-user-question.js)
+  //   or by the channel permission relay
+  // - The generic "needs your attention" text accompanies tool-use prompts that
+  //   the PreToolUse hook or channel permission relay already display with full context.
+  if (notificationCategory === 'permission_prompt' || notificationCategory === 'tool_use') {
+    logger.log('Skipping notification (category:', notificationCategory, ')');
     console.log(JSON.stringify({ continue: true }));
     return;
   }
