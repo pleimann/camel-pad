@@ -6472,7 +6472,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "camelpad:R_0402_1005Metric"
+		(property "Footprint" "camelpad:R_0603_1608Metric"
 			(at 99.06 133.858 90)
 			(effects
 				(font
@@ -6673,7 +6673,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "camelpad:R_0402_1005Metric"
+		(property "Footprint" "camelpad:R_0603_1608Metric"
 			(at 161.29 36.068 90)
 			(effects
 				(font
@@ -6742,7 +6742,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "camelpad:R_0402_1005Metric"
+		(property "Footprint" "camelpad:R_0603_1608Metric"
 			(at 99.06 131.318 90)
 			(effects
 				(font
@@ -7080,7 +7080,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
+		(property "Footprint" "camelpad:C_0603_1608Metric"
 			(at 54.3052 52.07 0)
 			(effects
 				(font
@@ -7443,7 +7443,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "LED_SMD:LED_0402_1005Metric"
+		(property "Footprint" "camelpad:LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder"
 			(at 90.17 38.1 0)
 			(effects
 				(font
@@ -7653,7 +7653,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
+		(property "Footprint" "camelpad:C_0603_1608Metric"
 			(at 28.2448 39.37 0)
 			(effects
 				(font
@@ -8726,7 +8726,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "CONN_53398_04_MOL"
+		(property "Footprint" "camelpad:CONN_53398_04_MOL"
 			(at 121.666 168.402 0)
 			(effects
 				(font
@@ -9238,7 +9238,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
+		(property "Footprint" "camelpad:C_0603_1608Metric"
 			(at 65.7352 52.07 0)
 			(effects
 				(font
@@ -9671,7 +9671,7 @@
 				)
 			)
 		)
-		(property "Footprint" "camelpad:R_Array_Convex_4x0603"
+		(property "Footprint" "camelpad:R_Array_Convex_4x1206"
 			(at 92.202 45.72 90)
 			(effects
 				(font
@@ -9757,7 +9757,7 @@
 				)
 			)
 		)
-		(property "Footprint" "camelpad:R_Array_Convex_4x0603"
+		(property "Footprint" "camelpad:R_Array_Convex_4x1206"
 			(at 129.54 35.052 90)
 			(effects
 				(font
@@ -9843,7 +9843,7 @@
 				)
 			)
 		)
-		(property "Footprint" "camelpad:R_Array_Convex_4x0603"
+		(property "Footprint" "camelpad:R_Array_Convex_4x1206"
 			(at 129.54 37.592 90)
 			(effects
 				(font

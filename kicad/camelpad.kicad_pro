@@ -58,7 +58,88 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "silk_edge_clearance|70580000|25000000|ed9d3a16-79b9-47d5-bce1-11832856ed55|abe8c651-74a7-4105-acc3-ec4de8e4d649",
+          ""
+        ],
+        [
+          "silk_edge_clearance|79520000|25000000|ed9d3a16-79b9-47d5-bce1-11832856ed55|c20ea688-717e-43fd-9259-85d42e22515a",
+          ""
+        ],
+        [
+          "silk_over_copper|109963310|88761700|d5c51b1b-bcde-41d6-963d-3eaf749295b3|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|110035299|58087500|eddcb7be-d789-43e5-ad87-317d4696527b|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|110740000|58431700|e8e72709-a93f-4047-ad52-943e4fe76fdc|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|119644821|61014648|67ae3bbc-ad75-4710-9f62-29dc08e50729|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|120173609|85837500|818bc59e-23f7-4d17-9c46-79ae30400520|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|120878310|86181700|77a2f1df-e898-4aee-9b61-5d631b326db0|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|129825299|58087500|8a4e9191-220a-4047-bc0b-4d822f7c71dc|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|130530000|58431700|416f5bdc-e293-43aa-9cf1-6ab0e7e1bf67|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|60394821|61014648|3d7b2782-2d00-4c36-90b5-0f2b8d65a95d|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|69964701|58087500|fd421a2e-9ab8-46ab-9681-f26d5c47a824|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|70344821|88764648|2b45ebc9-8061-432c-8bc9-781ce3a27d95|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|71280000|58431700|accb97dc-eaaf-4f42-88f8-82497f481a5f|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|79955511|85854404|4dcb33cc-5094-4eae-b198-969211dc7d4c|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|80164821|61014648|62e304cf-d186-4749-863c-a1a530ae13a5|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|81230000|86181700|5d534215-1bf9-484e-a6d8-12ca7f2911b1|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|90345299|58087500|fd3cc67a-db3f-407b-97a4-84418351004b|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|91050000|58431700|dc4dba25-92f3-4640-83e3-4752dbbdc6e8|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_over_copper|99854821|61014648|21c66d10-bae7-4e5f-bbd7-a15b25e73d8f|00000000-0000-0000-0000-000000000000",
+          ""
+        ]
+      ],
       "meta": {
         "version": 2
       },
@@ -139,7 +220,7 @@
         "min_track_width": 0.1,
         "min_via_annular_width": 0.1,
         "min_via_diameter": 0.5,
-        "solder_mask_to_copper_clearance": 0.0,
+        "solder_mask_to_copper_clearance": 0.005,
         "use_height_for_length_calcs": true
       },
       "teardrop_options": [
@@ -610,12 +691,36 @@
           "label": "Datasheet",
           "name": "Datasheet",
           "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Pins",
+          "name": "Sim.Pins",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Device",
+          "name": "Sim.Device",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Description",
+          "name": "Description",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "#",
+          "name": "${ITEM_NUMBER}",
+          "show": false
         }
       ],
       "filter_string": "",
       "group_symbols": true,
       "include_excluded_from_bom": true,
-      "name": "Default Editing",
+      "name": "",
       "sort_asc": true,
       "sort_field": "Reference"
     },
