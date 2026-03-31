@@ -2,4 +2,5 @@
   (version 7)
   (lib (name "camelpad")(type "KiCad")(uri "${KIPRJMOD}/camelpad.kicad_sym")(options "")(descr ""))
   (lib (name "2026-03-08_14-34-07")(type "KiCad")(uri "/Users/mike/Downloads/KiCADv6/2026-03-08_14-34-07.kicad_sym")(options "")(descr ""))
+  (lib (name "EasyEDA")(type "KiCad")(uri "${KIPRJMOD}/camelpad.pretty/EasyEDA.kicad_sym")(options "")(descr ""))
 )
